@@ -6,85 +6,176 @@
 
 <title>VANOA Delivery Note</title>
 
-<!-- ✅ FIXED FAVICON (NETLIFY SAFE) -->
-<link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="icon" type="image/svg+xml"
+href="https://raw.githubusercontent.com/ShadowHD6/VANOA-Delivery-Note/main/Vanoa%20Favicom.svg">
 
-<!-- FONT -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
 
-<!-- PDF ENGINE -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
+:root{
+    --bg:#f6f7f9;
+    --card:#ffffff;
+    --text:#111;
+    --muted:#6b7280;
+    --line:#e5e7eb;
+}
+
+*{box-sizing:border-box}
+
 body{
     margin:0;
     font-family:Inter, sans-serif;
-    background:#f6f7f9;
-    color:#111;
+    background:var(--bg);
+    color:var(--text);
 }
 
-.layout{display:flex; min-height:100vh;}
+.layout{
+    display:flex;
+    min-height:100vh;
+}
 
+/* SIDEBAR */
 .sidebar{
-    width:320px;
-    background:#0b0b0b;
-    color:white;
-    padding:16px;
+    width:340px;
+    background:#0a0a0a;
+    color:#fff;
+    padding:18px;
+    transition:0.3s;
+}
+
+.sidebar.collapsed{width:70px;}
+.sidebar.collapsed .content{display:none;}
+
+.toggle{
+    width:100%;
+    padding:10px;
+    background:#fff;
+    border:none;
+    font-weight:700;
+    cursor:pointer;
+    margin-bottom:12px;
 }
 
 input,select{
     width:100%;
     padding:10px;
-    margin:6px 0 12px;
+    margin-top:6px;
     border-radius:8px;
     border:none;
+    outline:none;
 }
 
-button{
-    width:100%;
-    padding:10px;
-    margin-top:10px;
-    border:none;
-    border-radius:8px;
-    cursor:pointer;
-    font-weight:700;
-}
-
+/* MAIN */
 .main{
     flex:1;
-    padding:20px;
+    padding:24px;
 }
 
 .card{
-    background:#fff;
-    padding:40px;
-    border-radius:14px;
     max-width:900px;
+    background:#fff;
     margin:auto;
-    box-shadow:0 10px 30px rgba(0,0,0,0.08);
+    padding:48px;
+    border-radius:14px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.05);
 }
 
+/* HEADER */
 .header{
     display:flex;
     justify-content:space-between;
+    margin-bottom:40px;
+}
+
+.logo img{width:4.5cm;}
+
+.company{
+    font-size:12px;
+    color:var(--muted);
+    margin-top:6px;
+    line-height:1.4;
+}
+
+.doc-title{text-align:right;}
+.doc-title h1{margin:0;font-size:34px;font-weight:800;}
+.doc-meta{font-size:13px;color:var(--muted);}
+
+/* GRID */
+.grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:40px;
     margin-bottom:30px;
 }
 
-.logo img{
-    width:160px;
+.block-title{
+    font-size:11px;
+    font-weight:700;
+    text-transform:uppercase;
+    border-bottom:2px solid #000;
+    display:inline-block;
+    margin-bottom:10px;
 }
 
+/* TABLE */
 table{
     width:100%;
     border-collapse:collapse;
-    margin-top:20px;
 }
 
-td,th{
-    padding:10px;
-    border-bottom:1px solid #eee;
+th{
+    background:#000;
+    color:#fff;
+    padding:12px;
+    font-size:11px;
+    text-transform:uppercase;
+}
+
+td{
+    padding:12px;
+    border-bottom:1px solid var(--line);
+    font-size:14px;
+}
+
+/* TOTALS */
+.totals{
+    margin-top:30px;
+    max-width:320px;
+    margin-left:auto;
+}
+
+.row{
+    display:flex;
+    justify-content:space-between;
+    padding:5px 0;
+}
+
+.grand{
+    border-top:2px solid #000;
+    margin-top:8px;
+    padding-top:10px;
+    font-weight:900;
+    font-size:18px;
+}
+
+/* FOOTER */
+.footer{
+    margin-top:40px;
+    display:flex;
+    justify-content:space-between;
+    font-size:11px;
+    color:var(--muted);
+    border-top:1px solid var(--line);
+    padding-top:12px;
+}
+
+/* MOBILE */
+@media(max-width:900px){
+    .layout{flex-direction:column}
+    .sidebar{width:100%}
+    .card{padding:20px}
 }
 </style>
 </head>
@@ -93,81 +184,226 @@ td,th{
 
 <div class="layout">
 
-<div class="sidebar">
-<h3>Invoice</h3>
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
 
-<input id="client" placeholder="Client Name">
-<input id="address" placeholder="Address">
-<input id="invoice" placeholder="Invoice #">
+<button class="toggle" onclick="toggle()">☰</button>
 
-<button onclick="addRow()">Add Item</button>
+<div class="content">
+
+<h3>Document</h3>
+<input id="docNumber" placeholder="Invoice Number">
+
+<h3>Company</h3>
+<input id="companyName" placeholder="Company Name">
+<input id="companyPhone" placeholder="Phone">
+<input id="companyEmail" placeholder="Email">
+<input id="companyAddress" placeholder="Address">
+
+<h3>Client</h3>
+<input id="clientName" placeholder="Client Name">
+<input id="clientAddress" placeholder="Client Address">
+
+<!-- ✅ NEW FIELD ADDED -->
+<input id="clientMF" placeholder="MF (Tax ID)">
+
+<h3>Payment</h3>
+<select id="payment">
+<option>Cash</option>
+<option>Transfer</option>
+<option>Check</option>
+</select>
+
+<button onclick="addRow()">+ Add Item</button>
 <button onclick="exportPDF()">Export PDF</button>
+
+</div>
 </div>
 
+<!-- MAIN -->
 <div class="main">
 
-<div class="card" id="invoiceBox">
+<div class="card">
 
 <div class="header">
+
+<div>
 <div class="logo">
-<img src="https://raw.githubusercontent.com/ShadowHD6/VANOA-Delivery-Note/main/VANOA%20Logo.svg"
-crossorigin="anonymous">
+<img src="https://raw.githubusercontent.com/ShadowHD6/VANOA-Delivery-Note/main/VANOA%20Logo.svg">
 </div>
 
-<h2>Delivery Note</h2>
+<div class="company" id="companyInfo"></div>
 </div>
 
-<div id="preview"></div>
+<div class="doc-title">
+<h1>Delivery Note</h1>
+<div class="doc-meta" id="pNumber"></div>
+<div class="doc-meta" id="pDate"></div>
+</div>
+
+</div>
+
+<div class="grid">
+
+<div>
+<div class="block-title">Billing To</div>
+<div id="pClient"></div>
+</div>
+
+<div>
+<div class="block-title">Client Details</div>
+
+<div>MF: <span id="pMF"></span></div>
+<div>Payment: <span id="pPayment"></span></div>
+
+</div>
+
+</div>
 
 <table>
 <thead>
 <tr>
-<th>Item</th>
+<th>Description</th>
 <th>Qty</th>
-<th>Price</th>
+<th>Unit</th>
+<th>Total</th>
+<th></th>
 </tr>
 </thead>
 <tbody id="rows"></tbody>
 </table>
 
+<div class="totals">
+<div class="row"><span>Subtotal</span><span id="sub">0.000</span></div>
+<div class="row"><span>VAT 19%</span><span id="vat">0.000</span></div>
+<div class="row"><span>Stamp</span><span>1.000</span></div>
+<div class="row grand"><span>NET</span><span id="net">0.000</span></div>
 </div>
 
+<div class="footer">
+<div>www.vanoa.tn</div>
+<div>@vanoa</div>
+<div>MF: I304285/Z/A/M/000</div>
+</div>
+
+</div>
 </div>
 </div>
 
 <script>
-const rows=document.getElementById("rows");
+const { jsPDF } = window.jspdf;
+
+function toggle(){
+document.getElementById("sidebar").classList.toggle("collapsed");
+}
+
+const rowsEl=document.getElementById("rows");
+
+const sub=document.getElementById("sub");
+const vat=document.getElementById("vat");
+const net=document.getElementById("net");
+
+const pNumber=document.getElementById("pNumber");
+const pDate=document.getElementById("pDate");
+const pClient=document.getElementById("pClient");
+const pPayment=document.getElementById("pPayment");
+const pMF=document.getElementById("pMF");
+
+const companyInfo=document.getElementById("companyInfo");
+
+const docNumber=document.getElementById("docNumber");
+
+const companyName=document.getElementById("companyName");
+const companyPhone=document.getElementById("companyPhone");
+const companyEmail=document.getElementById("companyEmail");
+const companyAddress=document.getElementById("companyAddress");
+
+const clientName=document.getElementById("clientName");
+const clientAddress=document.getElementById("clientAddress");
+const clientMF=document.getElementById("clientMF");
+
+const payment=document.getElementById("payment");
+
+const f=n=>(n||0).toFixed(3);
+
+pDate.innerText=new Date().toLocaleDateString();
+
+function updateCompany(){
+companyInfo.innerHTML=
+`${companyName.value}<br>
+${companyPhone.value}<br>
+${companyEmail.value}<br>
+${companyAddress.value}`;
+}
 
 function addRow(){
-rows.innerHTML += `
-<tr>
+const tr=document.createElement("tr");
+
+tr.innerHTML=`
 <td><input></td>
 <td><input type="number"></td>
 <td><input type="number"></td>
-</tr>`;
+<td class="t">0.000</td>
+<td><button onclick="this.closest('tr').remove();update()">✕</button></td>
+`;
+
+rowsEl.appendChild(tr);
+tr.querySelectorAll("input").forEach(i=>i.addEventListener("input",update));
+update();
+}
+
+function update(){
+let s=0;
+
+document.querySelectorAll("#rows tr").forEach(tr=>{
+let q=+tr.children[1].children[0].value||0;
+let p=+tr.children[2].children[0].value||0;
+let t=q*p;
+tr.querySelector(".t").innerText=f(t);
+s+=t;
+});
+
+let v=s*0.19;
+let n=s+v+1;
+
+sub.innerText=f(s);
+vat.innerText=f(v);
+net.innerText=f(n);
+
+pNumber.innerText="#"+docNumber.value;
+
+pClient.innerHTML=`${clientName.value}<br>${clientAddress.value}`;
+pPayment.innerText=payment.value;
+pMF.innerText=clientMF.value;
+
+updateCompany();
 }
 
 function exportPDF(){
+const pdf=new jsPDF("p","mm","a4");
 
-const element=document.getElementById("invoiceBox");
+pdf.setFontSize(18);
+pdf.text("Delivery Note",140,20);
+pdf.setFontSize(10);
+pdf.text("#"+docNumber.value,140,28);
 
-html2canvas(element,{
-scale:2,
-useCORS:true,
-backgroundColor:"#fff"
-}).then(canvas=>{
+pdf.text(clientName.value,20,60);
+pdf.text(clientAddress.value,20,66);
+pdf.text("MF: "+clientMF.value,20,72);
 
-const img=canvas.toDataURL("image/png");
+let y=90;
 
-const pdf=new jspdf.jsPDF("p","mm","a4");
-
-const width=210;
-const height=(canvas.height*width)/canvas.width;
-
-pdf.addImage(img,"PNG",0,0,width,height);
-pdf.save("invoice.pdf");
-
+document.querySelectorAll("#rows tr").forEach(tr=>{
+pdf.text(tr.children[0].children[0].value||"-",20,y);
+pdf.text(tr.children[1].children[0].value||"0",100,y);
+pdf.text(tr.children[2].children[0].value||"0",130,y);
+pdf.text(tr.querySelector(".t").innerText,160,y);
+y+=8;
 });
+
+pdf.text("NET: "+net.innerText,140,y+10);
+
+pdf.save("DeliveryNote-"+docNumber.value+".pdf");
 }
 
 addRow();
