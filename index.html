@@ -6,39 +6,50 @@
 
 <title>VANOA Delivery Note</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
-:root {
-    --black:#111;
-    --gray:#777;
-    --bg:#f5f5f5;
+:root{
+    --text:#1f1f1f;
+    --muted:#6b6b6b;
+    --line:#eaeaea;
 }
 
-body {
+*{box-sizing:border-box}
+
+body{
     margin:0;
-    font-family: Inter, sans-serif;
-    background:var(--bg);
+    font-family:Inter, sans-serif;
+    background:#f5f5f5;
 }
 
-/* LAYOUT */
-.container {
+/* APP LAYOUT */
+.container{
     display:flex;
     min-height:100vh;
 }
 
 /* PANEL */
-.panel {
+.panel{
     width:320px;
     background:#111;
-    color:white;
+    color:#fff;
     padding:20px;
 }
 
-.panel input, .panel select {
+.panel h2{margin:0 0 10px 0}
+
+.panel h3{
+    font-size:12px;
+    color:#aaa;
+    margin-top:18px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+}
+
+.panel input, .panel select{
     width:100%;
     padding:12px;
     margin-top:6px;
@@ -46,25 +57,24 @@ body {
     border-radius:6px;
 }
 
-.panel button {
+.panel button{
     width:100%;
     padding:14px;
     margin-top:10px;
     border:none;
     border-radius:6px;
-    background:white;
-    font-weight:bold;
+    background:#fff;
+    font-weight:700;
     cursor:pointer;
 }
 
-/* PREVIEW */
-.preview {
+/* DOCUMENT */
+.preview{
     flex:1;
-    padding:20px;
+    padding:30px;
 }
 
-/* DOCUMENT */
-.invoice-card {
+.doc{
     width:210mm;
     min-height:297mm;
     background:white;
@@ -73,123 +83,155 @@ body {
     position:relative;
 }
 
-/* HEADER */
-.header-main {
+/* =========================
+   PREMIUM SAAS HEADER
+========================= */
+
+.header{
     display:flex;
     justify-content:space-between;
-    margin-bottom:50px;
+    align-items:flex-start;
+    margin-bottom:45px;
 }
 
-.brand-logo {
-    font-size:24px;
-    font-weight:800;
+/* LEFT BRAND BLOCK */
+.brand{
+    display:flex;
+    gap:14px;
+    align-items:flex-start;
 }
 
-.logo-box {
-    background:black;
-    color:white;
-    padding:0 8px;
+/* LOGO */
+.brand img{
+    width:4.5cm;
+    height:auto;
+    object-fit:contain;
 }
 
-.brand-info {
-    font-size:13px;
-    color:#666;
+/* BRAND TEXT */
+.brand-text{
+    display:flex;
+    flex-direction:column;
 }
 
-.doc-type h1 {
-    font-size:48px;
+.brand-title{
+    font-size:14px;
+    font-weight:700;
+    letter-spacing:1px;
+    text-transform:uppercase;
+}
+
+.brand-sub{
+    font-size:12px;
+    color:var(--muted);
+    margin-top:6px;
+    line-height:1.4;
+}
+
+/* RIGHT DOC INFO */
+.doc-info{
+    text-align:right;
+}
+
+.doc-info h1{
+    font-size:40px;
     margin:0;
+    font-weight:900;
+    letter-spacing:-1px;
 }
 
-.doc-number {
-    color:#777;
+.doc-number{
+    margin-top:6px;
+    font-size:14px;
+    color:var(--muted);
+}
+
+.doc-date{
+    font-size:13px;
+    color:var(--muted);
+    margin-top:4px;
 }
 
 /* BILLING */
-.billing-grid {
+.billing{
     display:grid;
     grid-template-columns:1fr 1fr;
     gap:40px;
-    margin-bottom:40px;
+    margin-bottom:35px;
 }
 
-.billing-title {
-    font-weight:bold;
-    border-bottom:2px solid black;
+.block-title{
+    font-size:12px;
+    font-weight:700;
+    text-transform:uppercase;
+    border-bottom:2px solid #000;
+    display:inline-block;
+    padding-bottom:4px;
     margin-bottom:10px;
 }
 
 /* TABLE */
-table {
+table{
     width:100%;
     border-collapse:collapse;
 }
 
-th {
-    background:black;
-    color:white;
+th{
+    background:#000;
+    color:#fff;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:1px;
     padding:12px;
 }
 
-td {
-    padding:12px;
-    border-bottom:1px solid #eee;
+td{
+    padding:14px;
+    border-bottom:1px solid var(--line);
+    font-size:14px;
 }
 
-td input {
-    width:100%;
-    padding:6px;
+/* TOTALS */
+.totals{
+    margin-top:35px;
+    max-width:340px;
+    margin-left:auto;
 }
 
-/* SUMMARY */
-.summary-container {
-    display:flex;
-    justify-content:space-between;
-    margin-top:30px;
-}
-
-.terms-box {
-    width:50%;
-    font-size:12px;
-    color:#666;
-}
-
-.totals-box {
-    width:35%;
-}
-
-.total-row {
+.row{
     display:flex;
     justify-content:space-between;
     padding:6px 0;
+    font-size:14px;
 }
 
-.grand-total {
-    border-top:2px solid black;
-    font-weight:bold;
+.grand{
+    border-top:2px solid #000;
+    margin-top:10px;
+    padding-top:10px;
     font-size:18px;
+    font-weight:900;
 }
 
 /* FOOTER */
-.footer-minimal {
+.footer{
     position:absolute;
-    bottom:40px;
+    bottom:50px;
     left:60px;
     right:60px;
     display:flex;
     justify-content:space-between;
     font-size:12px;
-    color:#777;
+    color:var(--muted);
+    border-top:1px solid var(--line);
+    padding-top:15px;
 }
 
-/* WATERMARK */
-.watermark {
-    position:absolute;
-    right:20px;
-    top:50%;
-    transform:rotate(90deg);
-    font-size:100px;
-    color:rgba(0,0,0,0.03);
+/* MOBILE */
+@media(max-width:900px){
+    .container{flex-direction:column}
+    .panel{width:100%}
+    .doc{width:100%; padding:25px}
 }
 </style>
 </head>
@@ -198,14 +240,19 @@ td input {
 
 <div class="container">
 
+<!-- PANEL -->
 <div class="panel">
 <h2>Control Panel</h2>
 
+<h3>Document</h3>
 <input id="docNumber" placeholder="Number">
-<input id="clientName" placeholder="Client Name">
+
+<h3>Client</h3>
+<input id="clientName" placeholder="Name">
 <input id="clientAddress" placeholder="Address">
 <input id="taxId" placeholder="Tax ID">
 
+<h3>Payment</h3>
 <select id="payment">
 <option>Cash</option>
 <option>Transfer</option>
@@ -213,40 +260,53 @@ td input {
 </select>
 
 <button onclick="addRow()">+ Add Item</button>
-<button onclick="downloadPDF()">Download PDF</button>
+<button onclick="exportPDF()">Export PDF</button>
 </div>
 
+<!-- DOCUMENT -->
 <div class="preview">
-<div class="invoice-card" id="doc">
+<div class="doc" id="doc">
 
-<div class="watermark">VANOA</div>
+<!-- HEADER -->
+<div class="header">
 
-<header class="header-main">
-<div>
-<div class="brand-logo"><span class="logo-box">V</span> VANOA</div>
-<div class="brand-info">Tunisia</div>
+<div class="brand">
+<img src="https://raw.githubusercontent.com/ShadowHD6/VANOA-Delivery-Note/main/VANOA%20Logo.svg">
+
+<div class="brand-text">
+<div class="brand-title">VANOA Studio</div>
+<div class="brand-sub">
++216 52 287 812<br>
+contact@vanoa.net<br>
+Tunisia
+</div>
 </div>
 
-<div class="doc-type">
+</div>
+
+<div class="doc-info">
 <h1>Delivery Note</h1>
 <div class="doc-number" id="pNumber"></div>
-<div id="pDate"></div>
+<div class="doc-date" id="pDate"></div>
 </div>
-</header>
 
-<div class="billing-grid">
+</div>
+
+<!-- BILLING -->
+<div class="billing">
 <div>
-<div class="billing-title">Billing To</div>
+<div class="block-title">Billing To</div>
 <div id="pClient"></div>
 </div>
 
 <div>
-<div class="billing-title">Details</div>
-<div>Tax: <span id="pTax"></span></div>
+<div class="block-title">Details</div>
+<div>Tax ID: <span id="pTax"></span></div>
 <div>Payment: <span id="pPayment"></span></div>
 </div>
 </div>
 
+<!-- TABLE -->
 <table>
 <thead>
 <tr>
@@ -260,24 +320,19 @@ td input {
 <tbody id="rows"></tbody>
 </table>
 
-<div class="summary-container">
-<div class="terms-box">
-<b>Terms</b>
-<p>Goods delivered in good condition.</p>
+<!-- TOTALS -->
+<div class="totals">
+<div class="row"><span>Subtotal</span><span id="sub">0.000</span></div>
+<div class="row"><span>VAT 19%</span><span id="vat">0.000</span></div>
+<div class="row"><span>Stamp</span><span>1.000</span></div>
+<div class="row grand"><span>NET</span><span id="net">0.000</span></div>
 </div>
 
-<div class="totals-box">
-<div class="total-row"><span>Subtotal</span><span id="sub"></span></div>
-<div class="total-row"><span>VAT</span><span id="vat"></span></div>
-<div class="total-row"><span>Stamp</span><span>1.000</span></div>
-<div class="total-row grand-total"><span>NET</span><span id="net"></span></div>
-</div>
-</div>
-
-<div class="footer-minimal">
-<div>vanoa.tn</div>
+<!-- FOOTER -->
+<div class="footer">
+<div>www.vanoa.net</div>
 <div>@vanoa</div>
-<div>MF: XXXXX</div>
+<div>MF: 00000/Z/A/M/000</div>
 </div>
 
 </div>
@@ -294,22 +349,25 @@ const sub = document.getElementById("sub");
 const vatEl = document.getElementById("vat");
 const netEl = document.getElementById("net");
 
-const pNumber = document.getElementById("pNumber");
-const pDate = document.getElementById("pDate");
-const pClient = document.getElementById("pClient");
-
 const docNumber = document.getElementById("docNumber");
 const clientName = document.getElementById("clientName");
 const clientAddress = document.getElementById("clientAddress");
 const taxId = document.getElementById("taxId");
 const payment = document.getElementById("payment");
 
+const pNumber = document.getElementById("pNumber");
+const pDate = document.getElementById("pDate");
+const pClient = document.getElementById("pClient");
+const pTax = document.getElementById("pTax");
+const pPayment = document.getElementById("pPayment");
+
 const f = n => (n||0).toFixed(3);
 
 pDate.innerText = new Date().toLocaleDateString();
 
+/* ROWS */
 function addRow(){
-    let tr = document.createElement("tr");
+    const tr = document.createElement("tr");
 
     tr.innerHTML = `
     <td><input></td>
@@ -320,11 +378,7 @@ function addRow(){
     `;
 
     rowsEl.appendChild(tr);
-
-    tr.querySelectorAll("input").forEach(i=>{
-        i.addEventListener("input", update);
-    });
-
+    tr.querySelectorAll("input").forEach(i=>i.addEventListener("input",update));
     update();
 }
 
@@ -333,53 +387,104 @@ function removeRow(btn){
     update();
 }
 
+/* UPDATE */
 function update(){
-    let subtotal=0;
+    let subtotal = 0;
 
     document.querySelectorAll("#rows tr").forEach(tr=>{
-        let qty = parseFloat(tr.children[1].children[0].value)||0;
-        let price = parseFloat(tr.children[2].children[0].value)||0;
+        let q = +tr.children[1].children[0].value || 0;
+        let p = +tr.children[2].children[0].value || 0;
+        let t = q*p;
 
-        let total = qty*price;
-        tr.querySelector(".t").innerText = f(total);
-        subtotal+=total;
+        tr.querySelector(".t").innerText = f(t);
+        subtotal += t;
     });
 
-    let vat = subtotal*0.19;
-    let net = subtotal+vat+1;
+    let vat = subtotal * 0.19;
+    let net = subtotal + vat + 1;
 
     sub.innerText = f(subtotal);
     vatEl.innerText = f(vat);
     netEl.innerText = f(net);
 
-    pNumber.innerText = "#"+docNumber.value;
+    pNumber.innerText = "#" + docNumber.value;
 
-    pClient.innerHTML =
-        `${clientName.value}<br>${clientAddress.value}`;
-
-    document.getElementById("pTax").innerText = taxId.value;
-    document.getElementById("pPayment").innerText = payment.value;
+    pClient.innerHTML = `${clientName.value}<br>${clientAddress.value}`;
+    pTax.innerText = taxId.value;
+    pPayment.innerText = payment.value;
 }
 
-async function downloadPDF(){
-    const element = document.getElementById("doc");
-
-    const canvas = await html2canvas(element, { scale:2 });
-
-    const imgData = canvas.toDataURL("image/png");
+/* ===== TRUE VECTOR PDF EXPORT (NO SCREENSHOT) ===== */
+function exportPDF(){
 
     const pdf = new jsPDF("p","mm","a4");
 
-    const width = 210;
-    const height = canvas.height * width / canvas.width;
+    const margin = 20;
+    let y = 20;
 
-    pdf.addImage(imgData, "PNG", 0, 0, width, height);
+    // HEADER
+    pdf.setFont("helvetica","bold");
+    pdf.setFontSize(22);
+    pdf.text("Delivery Note", 150, y);
 
-    pdf.save("DeliveryNote-"+docNumber.value+".pdf");
+    pdf.setFontSize(10);
+    pdf.setFont("helvetica","normal");
+    pdf.text("#" + docNumber.value, 150, y+8);
+    pdf.text(pDate.innerText, 150, y+14);
+
+    // CLIENT
+    y += 25;
+    pdf.setFontSize(12);
+    pdf.setFont("helvetica","bold");
+    pdf.text("Billing To", margin, y);
+
+    pdf.setFont("helvetica","normal");
+    pdf.setFontSize(10);
+    pdf.text(clientName.value, margin, y+8);
+    pdf.text(clientAddress.value, margin, y+14);
+
+    // ITEMS HEADER
+    y += 30;
+    pdf.setFont("helvetica","bold");
+    pdf.text("Description", margin, y);
+    pdf.text("Qty", 100, y);
+    pdf.text("Unit", 130, y);
+    pdf.text("Total", 160, y);
+
+    pdf.setFont("helvetica","normal");
+
+    let rowY = y + 8;
+
+    document.querySelectorAll("#rows tr").forEach(tr=>{
+        const desc = tr.children[0].children[0].value;
+        const qty = tr.children[1].children[0].value;
+        const price = tr.children[2].children[0].value;
+        const total = qty * price;
+
+        pdf.text(desc || "-", margin, rowY);
+        pdf.text(String(qty || 0), 100, rowY);
+        pdf.text(String(price || 0), 130, rowY);
+        pdf.text(f(total), 160, rowY);
+
+        rowY += 8;
+    });
+
+    // TOTALS
+    rowY += 10;
+
+    pdf.setFont("helvetica","bold");
+    pdf.text("Subtotal: " + sub.innerText, 130, rowY);
+    pdf.text("VAT: " + vatEl.innerText, 130, rowY+6);
+    pdf.text("Stamp: 1.000", 130, rowY+12);
+    pdf.text("NET: " + netEl.innerText, 130, rowY+20);
+
+    // FOOTER
+    pdf.setFontSize(9);
+    pdf.setFont("helvetica","normal");
+    pdf.text("www.vanoa.net | @vanoa | MF: I304285/Z/A/M/000", margin, 285);
+
+    pdf.save("DeliveryNote-" + docNumber.value + ".pdf");
 }
-
-document.querySelectorAll("input,select")
-.forEach(i=>i.addEventListener("input",update));
 
 addRow();
 </script>
