@@ -6,7 +6,6 @@
 
 <title>VANOA Delivery Note</title>
 
-<!-- FAVICON -->
 <link rel="icon" type="image/svg+xml"
 href="https://raw.githubusercontent.com/ShadowHD6/VANOA-Delivery-Note/main/Vanoa%20Favicom.svg">
 
@@ -16,9 +15,11 @@ href="https://raw.githubusercontent.com/ShadowHD6/VANOA-Delivery-Note/main/Vanoa
 
 <style>
 :root{
-    --text:#1f1f1f;
-    --muted:#6b6b6b;
-    --line:#eaeaea;
+    --bg:#f6f7f9;
+    --card:#ffffff;
+    --text:#111;
+    --muted:#6b7280;
+    --line:#e5e7eb;
 }
 
 *{box-sizing:border-box}
@@ -26,148 +27,95 @@ href="https://raw.githubusercontent.com/ShadowHD6/VANOA-Delivery-Note/main/Vanoa
 body{
     margin:0;
     font-family:Inter, sans-serif;
-    background:#f5f5f5;
+    background:var(--bg);
+    color:var(--text);
 }
 
-/* LAYOUT */
-.container{
+.layout{
     display:flex;
     min-height:100vh;
 }
 
-/* PANEL */
-.panel{
-    width:320px;
-    background:#111;
+/* SIDEBAR */
+.sidebar{
+    width:340px;
+    background:#0a0a0a;
     color:#fff;
-    padding:20px;
+    padding:18px;
+    transition:0.3s;
 }
 
-.panel h2{margin:0 0 10px 0}
+.sidebar.collapsed{width:70px;}
+.sidebar.collapsed .content{display:none;}
 
-.panel h3{
-    font-size:12px;
-    color:#aaa;
-    margin-top:18px;
-    letter-spacing:1px;
-    text-transform:uppercase;
-}
-
-.panel input, .panel select{
+.toggle{
     width:100%;
-    padding:12px;
-    margin-top:6px;
-    border:none;
-    border-radius:6px;
-}
-
-.panel button{
-    width:100%;
-    padding:14px;
-    margin-top:10px;
-    border:none;
-    border-radius:6px;
+    padding:10px;
     background:#fff;
+    border:none;
     font-weight:700;
     cursor:pointer;
+    margin-bottom:12px;
 }
 
-/* DOCUMENT */
-.preview{
+input,select{
+    width:100%;
+    padding:10px;
+    margin-top:6px;
+    border-radius:8px;
+    border:none;
+    outline:none;
+}
+
+/* MAIN */
+.main{
     flex:1;
-    padding:30px;
+    padding:24px;
 }
 
-.doc{
-    width:210mm;
-    min-height:297mm;
-    background:white;
+.card{
+    max-width:900px;
+    background:#fff;
     margin:auto;
-    padding:60px;
-    position:relative;
+    padding:48px;
+    border-radius:14px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.05);
 }
 
-/* ===== PREMIUM HEADER ===== */
-
+/* HEADER */
 .header{
     display:flex;
     justify-content:space-between;
-    align-items:flex-start;
-    margin-bottom:45px;
+    margin-bottom:40px;
 }
 
-/* BRAND */
-.brand{
-    display:flex;
-    gap:14px;
-    align-items:flex-start;
-}
+.logo img{width:4.5cm;}
 
-/* LOGO */
-.brand img{
-    width:4.5cm;
-    height:auto;
-}
-
-/* TEXT */
-.brand-text{
-    display:flex;
-    flex-direction:column;
-}
-
-.brand-title{
-    font-size:14px;
-    font-weight:800;
-    letter-spacing:1px;
-    text-transform:uppercase;
-}
-
-.brand-sub{
+.company{
     font-size:12px;
     color:var(--muted);
     margin-top:6px;
     line-height:1.4;
 }
 
-/* DOC INFO */
-.doc-info{
-    text-align:right;
-}
+.doc-title{text-align:right;}
+.doc-title h1{margin:0;font-size:34px;font-weight:800;}
+.doc-meta{font-size:13px;color:var(--muted);}
 
-.doc-info h1{
-    font-size:40px;
-    margin:0;
-    font-weight:900;
-    letter-spacing:-1px;
-}
-
-.doc-number{
-    margin-top:6px;
-    font-size:14px;
-    color:var(--muted);
-}
-
-.doc-date{
-    font-size:13px;
-    color:var(--muted);
-    margin-top:4px;
-}
-
-/* BILLING */
-.billing{
+/* GRID */
+.grid{
     display:grid;
     grid-template-columns:1fr 1fr;
     gap:40px;
-    margin-bottom:35px;
+    margin-bottom:30px;
 }
 
 .block-title{
-    font-size:12px;
+    font-size:11px;
     font-weight:700;
     text-transform:uppercase;
     border-bottom:2px solid #000;
     display:inline-block;
-    padding-bottom:4px;
     margin-bottom:10px;
 }
 
@@ -180,77 +128,84 @@ table{
 th{
     background:#000;
     color:#fff;
+    padding:12px;
     font-size:11px;
     text-transform:uppercase;
-    padding:12px;
 }
 
 td{
-    padding:14px;
+    padding:12px;
     border-bottom:1px solid var(--line);
     font-size:14px;
 }
 
 /* TOTALS */
 .totals{
-    margin-top:35px;
-    max-width:340px;
+    margin-top:30px;
+    max-width:320px;
     margin-left:auto;
 }
 
 .row{
     display:flex;
     justify-content:space-between;
-    padding:6px 0;
-    font-size:14px;
+    padding:5px 0;
 }
 
 .grand{
     border-top:2px solid #000;
-    margin-top:10px;
+    margin-top:8px;
     padding-top:10px;
-    font-size:18px;
     font-weight:900;
+    font-size:18px;
 }
 
 /* FOOTER */
 .footer{
-    position:absolute;
-    bottom:50px;
-    left:60px;
-    right:60px;
+    margin-top:40px;
     display:flex;
     justify-content:space-between;
-    font-size:12px;
+    font-size:11px;
     color:var(--muted);
     border-top:1px solid var(--line);
-    padding-top:15px;
+    padding-top:12px;
 }
 
 /* MOBILE */
 @media(max-width:900px){
-    .container{flex-direction:column}
-    .panel{width:100%}
-    .doc{width:100%; padding:25px}
+    .layout{flex-direction:column}
+    .sidebar{width:100%}
+    .card{padding:20px}
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="layout">
 
-<!-- PANEL -->
-<div class="panel">
-<h2>Control Panel</h2>
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+
+<button class="toggle" onclick="toggle()">☰</button>
+
+<div class="content">
 
 <h3>Document</h3>
-<input id="docNumber" placeholder="Number">
+<input id="docNumber" placeholder="Invoice Number">
+
+<h3>Company</h3>
+<input id="companyName" placeholder="Company Name">
+<input id="companyPhone" placeholder="Phone">
+<input id="companyEmail" placeholder="Email">
+<input id="companyAddress" placeholder="Address">
 
 <h3>Client</h3>
-<input id="clientName" placeholder="Name">
-<input id="clientAddress" placeholder="Address">
-<input id="taxId" placeholder="Tax ID">
+<input id="clientName" placeholder="Client Name">
+<input id="clientAddress" placeholder="Client Address">
+
+<!-- ✅ NEW FIELD ADDED -->
+<input id="clientMF" placeholder="MF (Tax ID)">
 
 <h3>Payment</h3>
 <select id="payment">
@@ -261,52 +216,50 @@ td{
 
 <button onclick="addRow()">+ Add Item</button>
 <button onclick="exportPDF()">Export PDF</button>
+
+</div>
 </div>
 
-<!-- DOCUMENT -->
-<div class="preview">
-<div class="doc">
+<!-- MAIN -->
+<div class="main">
 
-<!-- HEADER -->
+<div class="card">
+
 <div class="header">
 
-<div class="brand">
+<div>
+<div class="logo">
 <img src="https://raw.githubusercontent.com/ShadowHD6/VANOA-Delivery-Note/main/VANOA%20Logo.svg">
-
-<div class="brand-text">
-<div class="brand-title">VANOA Studio</div>
-<div class="brand-sub">
-+216 52 287 812<br>
-contact@vanoa.net<br>
-Tunisia
-</div>
 </div>
 
+<div class="company" id="companyInfo"></div>
 </div>
 
-<div class="doc-info">
+<div class="doc-title">
 <h1>Delivery Note</h1>
-<div class="doc-number" id="pNumber"></div>
-<div class="doc-date" id="pDate"></div>
+<div class="doc-meta" id="pNumber"></div>
+<div class="doc-meta" id="pDate"></div>
 </div>
 
 </div>
 
-<!-- BILLING -->
-<div class="billing">
+<div class="grid">
+
 <div>
 <div class="block-title">Billing To</div>
 <div id="pClient"></div>
 </div>
 
 <div>
-<div class="block-title">Details</div>
-<div>Tax ID: <span id="pTax"></span></div>
+<div class="block-title">Client Details</div>
+
+<div>MF: <span id="pMF"></span></div>
 <div>Payment: <span id="pPayment"></span></div>
-</div>
+
 </div>
 
-<!-- TABLE -->
+</div>
+
 <table>
 <thead>
 <tr>
@@ -320,7 +273,6 @@ Tunisia
 <tbody id="rows"></tbody>
 </table>
 
-<!-- TOTALS -->
 <div class="totals">
 <div class="row"><span>Subtotal</span><span id="sub">0.000</span></div>
 <div class="row"><span>VAT 19%</span><span id="vat">0.000</span></div>
@@ -328,133 +280,130 @@ Tunisia
 <div class="row grand"><span>NET</span><span id="net">0.000</span></div>
 </div>
 
-<!-- FOOTER -->
 <div class="footer">
-<div>www.vanoa.net</div>
+<div>www.vanoa.tn</div>
 <div>@vanoa</div>
 <div>MF: I304285/Z/A/M/000</div>
 </div>
 
 </div>
 </div>
-
 </div>
 
 <script>
 const { jsPDF } = window.jspdf;
 
-const rowsEl = document.getElementById("rows");
+function toggle(){
+document.getElementById("sidebar").classList.toggle("collapsed");
+}
 
-const sub = document.getElementById("sub");
-const vatEl = document.getElementById("vat");
-const netEl = document.getElementById("net");
+const rowsEl=document.getElementById("rows");
 
-const docNumber = document.getElementById("docNumber");
-const clientName = document.getElementById("clientName");
-const clientAddress = document.getElementById("clientAddress");
-const taxId = document.getElementById("taxId");
-const payment = document.getElementById("payment");
+const sub=document.getElementById("sub");
+const vat=document.getElementById("vat");
+const net=document.getElementById("net");
 
-const pNumber = document.getElementById("pNumber");
-const pDate = document.getElementById("pDate");
-const pClient = document.getElementById("pClient");
-const pTax = document.getElementById("pTax");
-const pPayment = document.getElementById("pPayment");
+const pNumber=document.getElementById("pNumber");
+const pDate=document.getElementById("pDate");
+const pClient=document.getElementById("pClient");
+const pPayment=document.getElementById("pPayment");
+const pMF=document.getElementById("pMF");
 
-const f = n => (n||0).toFixed(3);
+const companyInfo=document.getElementById("companyInfo");
 
-pDate.innerText = new Date().toLocaleDateString();
+const docNumber=document.getElementById("docNumber");
 
-/* ROWS */
+const companyName=document.getElementById("companyName");
+const companyPhone=document.getElementById("companyPhone");
+const companyEmail=document.getElementById("companyEmail");
+const companyAddress=document.getElementById("companyAddress");
+
+const clientName=document.getElementById("clientName");
+const clientAddress=document.getElementById("clientAddress");
+const clientMF=document.getElementById("clientMF");
+
+const payment=document.getElementById("payment");
+
+const f=n=>(n||0).toFixed(3);
+
+pDate.innerText=new Date().toLocaleDateString();
+
+function updateCompany(){
+companyInfo.innerHTML=
+`${companyName.value}<br>
+${companyPhone.value}<br>
+${companyEmail.value}<br>
+${companyAddress.value}`;
+}
+
 function addRow(){
-    const tr = document.createElement("tr");
+const tr=document.createElement("tr");
 
-    tr.innerHTML = `
-    <td><input></td>
-    <td><input type="number"></td>
-    <td><input type="number"></td>
-    <td class="t">0.000</td>
-    <td><button onclick="removeRow(this)">✕</button></td>
-    `;
+tr.innerHTML=`
+<td><input></td>
+<td><input type="number"></td>
+<td><input type="number"></td>
+<td class="t">0.000</td>
+<td><button onclick="this.closest('tr').remove();update()">✕</button></td>
+`;
 
-    rowsEl.appendChild(tr);
-    tr.querySelectorAll("input").forEach(i=>i.addEventListener("input",update));
-    update();
+rowsEl.appendChild(tr);
+tr.querySelectorAll("input").forEach(i=>i.addEventListener("input",update));
+update();
 }
 
-function removeRow(btn){
-    btn.closest("tr").remove();
-    update();
-}
-
-/* UPDATE */
 function update(){
-    let subtotal=0;
+let s=0;
 
-    document.querySelectorAll("#rows tr").forEach(tr=>{
-        let q = +tr.children[1].children[0].value||0;
-        let p = +tr.children[2].children[0].value||0;
-        let t = q*p;
+document.querySelectorAll("#rows tr").forEach(tr=>{
+let q=+tr.children[1].children[0].value||0;
+let p=+tr.children[2].children[0].value||0;
+let t=q*p;
+tr.querySelector(".t").innerText=f(t);
+s+=t;
+});
 
-        tr.querySelector(".t").innerText = f(t);
-        subtotal+=t;
-    });
+let v=s*0.19;
+let n=s+v+1;
 
-    let vat = subtotal*0.19;
-    let net = subtotal+vat+1;
+sub.innerText=f(s);
+vat.innerText=f(v);
+net.innerText=f(n);
 
-    sub.innerText=f(subtotal);
-    vatEl.innerText=f(vat);
-    netEl.innerText=f(net);
+pNumber.innerText="#"+docNumber.value;
 
-    pNumber.innerText="#"+docNumber.value;
+pClient.innerHTML=`${clientName.value}<br>${clientAddress.value}`;
+pPayment.innerText=payment.value;
+pMF.innerText=clientMF.value;
 
-    pClient.innerHTML=`${clientName.value}<br>${clientAddress.value}`;
-    pTax.innerText=taxId.value;
-    pPayment.innerText=payment.value;
+updateCompany();
 }
 
-/* VECTOR PDF EXPORT */
 function exportPDF(){
-    const pdf = new jsPDF("p","mm","a4");
+const pdf=new jsPDF("p","mm","a4");
 
-    let y = 20;
+pdf.setFontSize(18);
+pdf.text("Delivery Note",140,20);
+pdf.setFontSize(10);
+pdf.text("#"+docNumber.value,140,28);
 
-    pdf.setFont("helvetica","bold");
-    pdf.setFontSize(22);
-    pdf.text("Delivery Note", 140, y);
+pdf.text(clientName.value,20,60);
+pdf.text(clientAddress.value,20,66);
+pdf.text("MF: "+clientMF.value,20,72);
 
-    pdf.setFontSize(10);
-    pdf.text("#"+docNumber.value, 140, y+8);
-    pdf.text(pDate.innerText, 140, y+14);
+let y=90;
 
-    y+=25;
+document.querySelectorAll("#rows tr").forEach(tr=>{
+pdf.text(tr.children[0].children[0].value||"-",20,y);
+pdf.text(tr.children[1].children[0].value||"0",100,y);
+pdf.text(tr.children[2].children[0].value||"0",130,y);
+pdf.text(tr.querySelector(".t").innerText,160,y);
+y+=8;
+});
 
-    pdf.setFont("helvetica","bold");
-    pdf.text("Billing To", 20, y);
+pdf.text("NET: "+net.innerText,140,y+10);
 
-    pdf.setFont("helvetica","normal");
-    pdf.text(clientName.value, 20, y+8);
-    pdf.text(clientAddress.value, 20, y+14);
-
-    y+=30;
-
-    document.querySelectorAll("#rows tr").forEach(tr=>{
-        pdf.text(tr.children[0].children[0].value||"-", 20, y);
-        pdf.text(tr.children[1].children[0].value||"0", 100, y);
-        pdf.text(tr.children[2].children[0].value||"0", 130, y);
-        pdf.text(tr.querySelector(".t").innerText, 160, y);
-        y+=8;
-    });
-
-    y+=10;
-
-    pdf.text("Subtotal: "+sub.innerText, 130, y);
-    pdf.text("VAT: "+vatEl.innerText, 130, y+6);
-    pdf.text("Stamp: 1.000", 130, y+12);
-    pdf.text("NET: "+netEl.innerText, 130, y+20);
-
-    pdf.save("DeliveryNote-"+docNumber.value+".pdf");
+pdf.save("DeliveryNote-"+docNumber.value+".pdf");
 }
 
 addRow();
