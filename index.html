@@ -73,12 +73,28 @@ input, select {
 }
 
 .card {
-    max-width: 900px;
+    width: 100%;
+    max-width: 800px; /* Safe width for scaling */
     background: #fff;
     margin: auto;
     padding: 48px;
     border-radius: 14px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+/* EXPORT OVERRIDES (Makes it A4 safe) */
+.is-exporting {
+    max-width: none !important;
+    width: 790px !important; /* Fixed width to guarantee perfect A4 scaling */
+    padding: 30px !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+}
+
+.export-span {
+    display: inline-block;
+    padding: 10px 0;
+    font-size: 14px;
 }
 
 /* HEADER */
@@ -137,6 +153,12 @@ td {
     padding: 12px;
     border-bottom: 1px solid var(--line);
     font-size: 14px;
+}
+
+td input {
+    margin: 0;
+    padding: 8px;
+    background: transparent;
 }
 
 .delete-btn {
@@ -306,7 +328,7 @@ const pPayment = document.getElementById("pPayment");
 const pMF = document.getElementById("pMF");
 const companyInfo = document.getElementById("companyInfo");
 
-// Setup real-time listeners for all sidebar inputs
+// Setup real-time listeners
 const inputsToWatch = [
     'docNumber', 'companyName', 'companyPhone', 'companyEmail', 
     'companyAddress', 'clientName', 'clientAddress', 'clientMF', 'payment'
@@ -382,28 +404,45 @@ function update(){
 }
 
 function exportPDF(){
-    // Temporarily hide delete buttons from the PDF
+    const element = document.getElementById('documentCard');
+    
+    // 1. Force A4 safe dimensions
+    element.classList.add('is-exporting');
+
+    // 2. Hide delete buttons
     const deleteCells = document.querySelectorAll('.hide-on-export');
     deleteCells.forEach(cell => cell.style.display = 'none');
 
-    const element = document.getElementById('documentCard');
+    // 3. Swap <input> fields for clean <span> text to fix table layout issues in PDF
+    const inputs = element.querySelectorAll('input');
+    inputs.forEach(input => {
+        const span = document.createElement('span');
+        span.className = 'export-span';
+        span.innerText = input.value || '-';
+        input.style.display = 'none';
+        input.parentNode.insertBefore(span, input);
+    });
+
     const docNumVal = document.getElementById("docNumber").value || "Draft";
 
     const opt = {
-        margin:       [10, 0, 10, 0],
+        margin:       10, // Gives a safe 10mm margin on all sides of the A4 paper
         filename:     `DeliveryNote-${docNumVal}.pdf`,
         image:        { type: 'jpeg', quality: 0.98 },
         html2canvas:  { 
             scale: 2, 
-            useCORS: true, // Crucial for external images/logos!
-            windowWidth: element.scrollWidth // Ensures correct wrapping
+            useCORS: true, 
+            scrollY: 0 
         },
         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
     html2pdf().set(opt).from(element).save().then(() => {
-        // Restore delete buttons after generation
+        // 4. Restore everything back to normal for the web view
+        element.classList.remove('is-exporting');
         deleteCells.forEach(cell => cell.style.display = '');
+        document.querySelectorAll('.export-span').forEach(span => span.remove());
+        inputs.forEach(input => input.style.display = '');
     });
 }
 
