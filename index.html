@@ -6,7 +6,9 @@
 <title>VANOA Delivery Note</title>
 
 <link rel="icon" type="image/svg+xml" href="https://cdn.jsdelivr.net/gh/ShadowHD6/VANOA-Delivery-Note@main/Vanoa%20Favicom.svg">
+
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <style>
@@ -28,7 +30,7 @@ body {
 
 .layout { display: flex; min-height: 100vh; }
 
-/* SIDEBAR */
+/* SIDEBAR STYLES */
 .sidebar {
     width: 340px;
     background: #0a0a0a;
@@ -54,6 +56,8 @@ body {
     margin-bottom: 12px;
 }
 
+.sidebar h3 { font-size: 14px; margin-top: 20px; color: #aaa; text-transform: uppercase; }
+
 input, select {
     width: 100%;
     padding: 10px;
@@ -61,7 +65,18 @@ input, select {
     border-radius: 8px;
     border: none;
     outline: none;
+    background: #222;
+    color: #fff;
 }
+
+input::placeholder { color: #666; }
+
+.btn-group { margin-top: 25px; display: flex; flex-direction: column; gap: 10px; }
+.btn { padding: 12px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+.btn-add { background: #fff; color: #000; }
+.btn-pdf { background: #22c55e; color: #fff; }
+.btn-img { background: #3b82f6; color: #fff; }
+.btn:hover { opacity: 0.9; transform: translateY(-1px); }
 
 /* MAIN PREVIEW AREA */
 .main {
@@ -72,14 +87,14 @@ input, select {
     background: #525659;
 }
 
-/* A4 CONTAINER */
+/* A4 CONTAINER (Strict Scaling) */
 .card {
     width: 210mm;
     height: 297mm;
     background: #fff;
     padding: 15px; /* Offset from A4 edge */
     box-sizing: border-box;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    box-shadow: 0 10px 50px rgba(0,0,0,0.3);
 }
 
 /* INNER FRAME (1mm Outline) */
@@ -91,20 +106,21 @@ input, select {
     flex-direction: column;
     box-sizing: border-box;
     position: relative;
+    overflow: hidden;
 }
 
-/* HEADER & LOGO */
+/* HEADER */
 .header {
     display: flex;
     justify-content: space-between;
     margin-bottom: 40px;
-    padding-top: 5px; /* Prevention for top-cropping */
 }
 
 .logo img { 
     width: 4.5cm; 
-    height: auto;
-    display: block;
+    max-height: 2.5cm;
+    object-fit: contain;
+    object-position: left top;
 }
 
 .doc-title { text-align: right; }
@@ -116,7 +132,7 @@ input, select {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 40px;
-    margin-bottom: 55px; /* ✅ SPACE FIXED: Between info and table */
+    margin-bottom: 55px; /* Spacing between info and table */
 }
 
 .block-title {
@@ -128,25 +144,25 @@ input, select {
     margin-bottom: 10px;
 }
 
+.info-content { font-size: 14px; line-height: 1.5; }
+
 /* TABLE */
 table { width: 100%; border-collapse: collapse; }
 th { background: #000; color: #fff; padding: 12px; font-size: 11px; text-transform: uppercase; text-align: left; }
 td { border-bottom: 1px solid var(--line); font-size: 14px; padding: 0; }
-td input { background: transparent; padding: 12px; }
+td input { background: transparent; padding: 12px; color: #000; width: 100%; border-radius: 0; }
 
 /* TOTALS BLOCK */
-.spacer { flex-grow: 1; } /* Pushes content below it to the bottom */
-
 .totals-wrapper {
     display: flex;
     justify-content: flex-end;
-    margin-top: auto; /* Force to bottom */
-    margin-bottom: 100px; /* ✅ POSITION FIXED: 100px from bottom edge */
+    margin-top: auto; /* Pushes to bottom */
+    margin-bottom: 100px; /* 100px from the bottom frame edge */
 }
 
-.totals { width: 300px; }
-.row { display: flex; justify-content: space-between; padding: 5px 0; }
-.grand { border-top: 2px solid #000; margin-top: 8px; padding-top: 10px; font-weight: 900; font-size: 18px; }
+.totals { width: 280px; }
+.row { display: flex; justify-content: space-between; padding: 6px 0; }
+.grand { border-top: 2px solid #000; margin-top: 8px; padding-top: 10px; font-weight: 900; font-size: 20px; }
 
 /* FOOTER */
 .footer {
@@ -165,7 +181,7 @@ td input { background: transparent; padding: 12px; }
 .hide-on-export { width: 40px; text-align: center; }
 .delete-btn { background: #ff4d4d; color: #fff; border: none; padding: 5px 10px; cursor: pointer; border-radius: 4px; }
 
-/* EXPORT MODE TWEAKS */
+/* EXPORT OVERRIDES */
 .is-exporting { box-shadow: none !important; }
 .export-text { padding: 12px; display: inline-block; }
 </style>
@@ -178,31 +194,43 @@ td input { background: transparent; padding: 12px; }
         <div class="content">
             <h3>Document</h3>
             <input id="docNumber" placeholder="Invoice Number" value="0001">
+            
             <h3>Company</h3>
             <input id="companyName" placeholder="Company Name" value="VANOA">
-            <input id="companyPhone" placeholder="Phone">
-            <input id="companyEmail" placeholder="Email">
-            <input id="companyAddress" placeholder="Address">
+            <input id="companyPhone" placeholder="Phone (+216 52 287 812)">
+            <input id="companyEmail" placeholder="Email (contact@vanoa.net)">
+            <input id="companyAddress" placeholder="Address (Mahdia, Tunisia)">
+            
             <h3>Client</h3>
             <input id="clientName" placeholder="Client Name">
             <input id="clientAddress" placeholder="Client Address">
             <input id="clientMF" placeholder="MF (Tax ID)">
+            
             <h3>Payment</h3>
-            <select id="payment"><option>Cash</option><option>Transfer</option><option>Check</option></select>
-            <button onclick="addRow()" style="margin-top:20px; width:100%; cursor:pointer; padding:10px;">+ Add Item</button>
-            <button onclick="exportPDF()" style="margin-top:10px; width:100%; cursor:pointer; padding:10px; background:#22c55e; color:#fff; border:none; font-weight:bold;">Export PDF</button>
+            <select id="payment">
+                <option>Cash</option>
+                <option>Transfer</option>
+                <option>Check</option>
+            </select>
+
+            <div class="btn-group">
+                <button class="btn btn-add" onclick="addRow()">+ Add Item</button>
+                <button class="btn btn-pdf" onclick="exportPDF()">Export PDF</button>
+                <button class="btn btn-img" onclick="exportImage()">Download Image</button>
+            </div>
         </div>
     </div>
 
     <div class="main">
         <div class="card" id="documentCard">
             <div class="card-inner">
+                
                 <div class="header">
                     <div>
                         <div class="logo">
                             <img src="https://raw.githubusercontent.com/ShadowHD6/VANOA-Delivery-Note/main/VANOA%20Logo.svg" crossorigin="anonymous">
                         </div>
-                        <div class="company" id="companyInfo"></div>
+                        <div class="company info-content" id="companyInfo"></div>
                     </div>
                     <div class="doc-title">
                         <h1>Delivery Note</h1>
@@ -214,16 +242,18 @@ td input { background: transparent; padding: 12px; }
                 <div class="grid">
                     <div>
                         <div class="block-title">Billing To</div>
-                        <div id="pClient">Client Name</div>
+                        <div class="info-content" id="pClient">Client Name</div>
                     </div>
                     <div>
                         <div class="block-title">Client Details</div>
-                        <div>MF: <span id="pMF">000000</span></div>
-                        <div>Payment: <span id="pPayment">Cash</span></div>
+                        <div class="info-content">
+                            <div>MF: <span id="pMF">000000</span></div>
+                            <div>Payment: <span id="pPayment">Cash</span></div>
+                        </div>
                     </div>
                 </div>
 
-                <table>
+                <table id="itemsTable">
                     <thead>
                         <tr>
                             <th>Description</th>
@@ -235,8 +265,6 @@ td input { background: transparent; padding: 12px; }
                     </thead>
                     <tbody id="rows"></tbody>
                 </table>
-
-                <div class="spacer"></div>
 
                 <div class="totals-wrapper">
                     <div class="totals">
@@ -258,38 +286,50 @@ td input { background: transparent; padding: 12px; }
 </div>
 
 <script>
+// Sidebar Toggle
 function toggle() { document.getElementById("sidebar").classList.toggle("collapsed"); }
 
-const inputs = ['docNumber', 'companyName', 'companyPhone', 'companyEmail', 'companyAddress', 'clientName', 'clientAddress', 'clientMF', 'payment'];
-inputs.forEach(id => document.getElementById(id).addEventListener('input', update));
+// Listeners for real-time updates
+const inputList = ['docNumber', 'companyName', 'companyPhone', 'companyEmail', 'companyAddress', 'clientName', 'clientAddress', 'clientMF', 'payment'];
+inputList.forEach(id => document.getElementById(id).addEventListener('input', update));
 
 function update() {
-    document.getElementById('pNumber').innerText = "#" + document.getElementById('docNumber').value;
-    document.getElementById('pMF').innerText = document.getElementById('clientMF').value;
-    document.getElementById('pPayment').innerText = document.getElementById('payment').value;
-    document.getElementById('pClient').innerHTML = `<strong>${document.getElementById('clientName').value}</strong><br>${document.getElementById('clientAddress').value}`;
+    // Meta Info
+    document.getElementById('pNumber').innerText = "#" + (document.getElementById('docNumber').value || "0001");
+    document.getElementById('pDate').innerText = new Date().toLocaleDateString();
     
-    document.getElementById('companyInfo').innerHTML = `<strong>${document.getElementById('companyName').value}</strong><br>${document.getElementById('companyPhone').value}<br>${document.getElementById('companyEmail').value}`;
+    // Client Info
+    document.getElementById('pMF').innerText = document.getElementById('clientMF').value || "000000";
+    document.getElementById('pPayment').innerText = document.getElementById('payment').value;
+    document.getElementById('pClient').innerHTML = `<strong>${document.getElementById('clientName').value || 'Client Name'}</strong><br>${document.getElementById('clientAddress').value || ''}`;
+    
+    // Company Info with Defaults
+    const cName = document.getElementById('companyName').value || "VANOA";
+    const cPhone = document.getElementById('companyPhone').value || "+216 52 287 812";
+    const cEmail = document.getElementById('companyEmail').value || "contact@vanoa.net";
+    const cAddress = document.getElementById('companyAddress').value || "Mahdia, Tunisia";
+    document.getElementById('companyInfo').innerHTML = `<strong>${cName}</strong><br>${cPhone}<br>${cEmail}<br>${cAddress}`;
 
-    let s = 0;
+    // Calculations
+    let subtotal = 0;
     document.querySelectorAll("#rows tr").forEach(tr => {
-        let q = +tr.querySelector('.qty').value || 0;
-        let u = +tr.querySelector('.unit').value || 0;
-        let t = q * u;
-        tr.querySelector('.total-cell').innerText = t.toFixed(3);
-        s += t;
+        const q = +tr.querySelector('.qty').value || 0;
+        const u = +tr.querySelector('.unit').value || 0;
+        const total = q * u;
+        tr.querySelector('.total-cell').innerText = total.toFixed(3);
+        subtotal += total;
     });
 
-    let v = s * 0.19;
-    document.getElementById('sub').innerText = s.toFixed(3);
-    document.getElementById('vat').innerText = v.toFixed(3);
-    document.getElementById('net').innerText = (s + v + 1).toFixed(3);
+    const vat = subtotal * 0.19;
+    document.getElementById('sub').innerText = subtotal.toFixed(3);
+    document.getElementById('vat').innerText = vat.toFixed(3);
+    document.getElementById('net').innerText = (subtotal + vat + 1.000).toFixed(3);
 }
 
 function addRow() {
     const tr = document.createElement("tr");
     tr.innerHTML = `
-        <td><input type="text" class="desc" placeholder="Item Name"></td>
+        <td><input type="text" class="desc" placeholder="Item Description"></td>
         <td><input type="number" class="qty" value="1"></td>
         <td><input type="number" class="unit" value="0.000" step="0.001"></td>
         <td class="total-cell" style="padding:12px">0.000</td>
@@ -300,844 +340,74 @@ function addRow() {
     update();
 }
 
-function exportPDF() {
+// Prepare document for export (convert inputs to text)
+function prepareForExport() {
     const element = document.getElementById('documentCard');
-    element.classList.add('is-exporting');
-    
-    // Convert inputs to text for export
-    const inputs = element.querySelectorAll('input');
-    inputs.forEach(i => {
+    const inputElements = element.querySelectorAll('input');
+    const replacements = [];
+
+    inputElements.forEach(i => {
         const span = document.createElement('span');
         span.className = 'export-text';
-        span.innerText = i.value;
+        // Logic to show value or placeholder if it's one of the defaults
+        span.innerText = i.value || (i.placeholder.includes('(') ? i.placeholder.split('(')[1].replace(')', '') : '');
         i.style.display = 'none';
         i.parentNode.insertBefore(span, i);
+        replacements.push({span, input: i});
     });
+    
+    return replacements;
+}
+
+// Cleanup after export
+function cleanupAfterExport(replacements) {
+    document.getElementById('documentCard').classList.remove('is-exporting');
+    replacements.forEach(item => {
+        item.span.remove();
+        item.input.style.display = '';
+    });
+}
+
+async function exportPDF() {
+    const element = document.getElementById('documentCard');
+    element.classList.add('is-exporting');
+    const replacements = prepareForExport();
 
     const opt = {
         margin: 0,
-        filename: 'DeliveryNote.pdf',
+        filename: `VANOA-DN-${document.getElementById('docNumber').value || 'Draft'}.pdf`,
         image: { type: 'jpeg', quality: 1 },
-        html2canvas: { scale: 2, useCORS: true, logging: false, letterRendering: true },
+        html2canvas: { scale: 3, useCORS: true, letterRendering: true },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
-    html2pdf().set(opt).from(element).save().then(() => {
-        element.classList.remove('is-exporting');
-        element.querySelectorAll('.export-text').forEach(s => s.remove());
-        inputs.forEach(i => i.style.display = '');
-    });
+    await html2pdf().set(opt).from(element).save();
+    cleanupAfterExport(replacements);
 }
 
-document.getElementById('pDate').innerText = new Date().toLocaleDateString();
-addRow();
-</script>
-</body>
-</html>
-/* MAIN */
-.main {
-    flex: 1;
-    padding: 40px;
-    display: flex;
-    justify-content: center;
-    background: #525659; /* PDF viewer grey background */
-}
-
-/* THE A4 CARD
-   Sets a strict physical size for the screen view that matches A4 dimensions. 
-*/
-.card {
-    width: 210mm;
-    min-height: 297mm;
-    background: #fff;
-    padding: 15px; /* The 15px offset from the A4 edge */
-    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-    box-sizing: border-box;
-}
-
-/* THE 1mm OUTLINE */
-.card-inner {
-    border: 1mm solid #000;
-    height: 100%;
-    min-height: calc(297mm - 30px);
-    padding: 40px;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-}
-
-/* EXPORT OVERRIDES */
-.is-exporting {
-    width: 210mm !important;
-    height: 297mm !important;
-    min-height: 297mm !important;
-    margin: 0 !important;
-    box-shadow: none !important;
-}
-.is-exporting .card-inner {
-    height: calc(297mm - 30px) !important;
-    min-height: calc(297mm - 30px) !important;
-}
-
-.export-span {
-    display: inline-block;
-    padding: 8px;
-    font-size: 14px;
-}
-
-/* HEADER */
-.header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 40px;
-}
-
-.logo img { width: 4.5cm; }
-
-.company {
-    font-size: 12px;
-    color: var(--muted);
-    margin-top: 6px;
-    line-height: 1.4;
-}
-
-.doc-title { text-align: right; }
-.doc-title h1 { margin: 0; font-size: 34px; font-weight: 800; }
-.doc-meta { font-size: 13px; color: var(--muted); }
-
-/* GRID */
-.grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 40px;
-    margin-bottom: 30px;
-}
-
-.block-title {
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    border-bottom: 2px solid #000;
-    display: inline-block;
-    margin-bottom: 10px;
-}
-
-/* TABLE */
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-th {
-    background: #000;
-    color: #fff;
-    padding: 12px;
-    font-size: 11px;
-    text-transform: uppercase;
-    text-align: left;
-}
-
-td {
-    padding: 0;
-    border-bottom: 1px solid var(--line);
-    font-size: 14px;
-}
-
-td input {
-    margin: 0;
-    padding: 12px;
-    background: transparent;
-    border-radius: 0;
-}
-
-.t-cell {
-    padding: 12px;
-}
-
-.delete-btn {
-    background: #ff4d4d;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    padding: 4px 8px;
-    cursor: pointer;
-    margin-left: 10px;
-}
-
-/* TOTALS */
-.totals-container {
-    margin-top: 30px;
-    display: flex;
-    justify-content: flex-end;
-}
-
-.totals {
-    width: 320px;
-}
-
-.row {
-    display: flex;
-    justify-content: space-between;
-    padding: 5px 0;
-}
-
-.grand {
-    border-top: 2px solid #000;
-    margin-top: 8px;
-    padding-top: 10px;
-    font-weight: 900;
-    font-size: 18px;
-}
-
-/* FOOTER */
-.footer {
-    margin-top: auto; /* Pushes footer strictly to the bottom of the bounding box */
-    display: flex;
-    justify-content: space-between;
-    font-size: 11px;
-    color: var(--muted);
-    border-top: 1px solid var(--line);
-    padding-top: 12px;
-}
-
-/* MOBILE SAFARI/CHROME */
-@media(max-width:900px){
-    .layout { flex-direction: column; }
-    .sidebar { width: 100%; height: auto; position: static; }
-    .main { padding: 10px; }
-    /* We scale the A4 box down visually for mobile, but the CSS actual size remains A4 for perfect export */
-    .card { transform: scale(0.9); transform-origin: top center; margin-bottom: -10%; }
-}
-@media(max-width:600px){
-    .card { transform: scale(0.6); margin-bottom: -50%; }
-}
-</style>
-</head>
-
-<body>
-
-<div class="layout">
-
-<div class="sidebar" id="sidebar">
-
-<button class="toggle" onclick="toggle()">☰</button>
-
-<div class="content">
-
-<h3>Document</h3>
-<input id="docNumber" placeholder="Invoice Number">
-
-<h3>Company</h3>
-<input id="companyName" placeholder="Company Name">
-<input id="companyPhone" placeholder="Phone">
-<input id="companyEmail" placeholder="Email">
-<input id="companyAddress" placeholder="Address">
-
-<h3>Client</h3>
-<input id="clientName" placeholder="Client Name">
-<input id="clientAddress" placeholder="Client Address">
-<input id="clientMF" placeholder="MF (Tax ID)">
-
-<h3>Payment</h3>
-<select id="payment">
-<option>Cash</option>
-<option>Transfer</option>
-<option>Check</option>
-</select>
-
-<button onclick="addRow()" style="margin-top:15px; width:100%; padding:10px; cursor:pointer;">+ Add Item</button>
-<button onclick="exportPDF()" style="margin-top:10px; width:100%; padding:10px; background:#4CAF50; color:white; border:none; cursor:pointer; font-weight:bold;">Export PDF</button>
-
-</div>
-</div>
-
-<div class="main">
-
-<div class="card" id="documentCard">
-    <div class="card-inner">
-
-        <div class="header">
-        <div>
-        <div class="logo">
-        <img src="https://raw.githubusercontent.com/ShadowHD6/VANOA-Delivery-Note/main/VANOA%20Logo.svg" crossorigin="anonymous">
-        </div>
-
-        <div class="company" id="companyInfo"></div>
-        </div>
-
-        <div class="doc-title">
-        <h1>Delivery Note</h1>
-        <div class="doc-meta" id="pNumber"></div>
-        <div class="doc-meta" id="pDate"></div>
-        </div>
-        </div>
-
-        <div class="grid">
-        <div>
-        <div class="block-title">Billing To</div>
-        <div id="pClient"></div>
-        </div>
-
-        <div>
-        <div class="block-title">Client Details</div>
-        <div>MF: <span id="pMF"></span></div>
-        <div>Payment: <span id="pPayment"></span></div>
-        </div>
-        </div>
-
-        <table>
-        <thead>
-        <tr>
-        <th>Description</th>
-        <th>Qty</th>
-        <th>Unit</th>
-        <th>Total</th>
-        <th class="hide-on-export"></th>
-        </tr>
-        </thead>
-        <tbody id="rows"></tbody>
-        </table>
-
-        <div class="totals-container">
-            <div class="totals">
-            <div class="row"><span>Subtotal</span><span id="sub">0.000</span></div>
-            <div class="row"><span>VAT 19%</span><span id="vat">0.000</span></div>
-            <div class="row"><span>Stamp</span><span>1.000</span></div>
-            <div class="row grand"><span>NET</span><span id="net">0.000</span></div>
-            </div>
-        </div>
-
-        <div class="footer">
-        <div>www.vanoa.tn</div>
-        <div>@vanoa</div>
-        <div>MF: I304285/Z/A/M/000</div>
-        </div>
-
-    </div>
-</div>
-
-</div>
-</div>
-
-<script>
-function toggle(){
-    document.getElementById("sidebar").classList.toggle("collapsed");
-}
-
-const rowsEl = document.getElementById("rows");
-const sub = document.getElementById("sub");
-const vat = document.getElementById("vat");
-const net = document.getElementById("net");
-
-const pNumber = document.getElementById("pNumber");
-const pDate = document.getElementById("pDate");
-const pClient = document.getElementById("pClient");
-const pPayment = document.getElementById("pPayment");
-const pMF = document.getElementById("pMF");
-const companyInfo = document.getElementById("companyInfo");
-
-// Setup real-time listeners
-const inputsToWatch = [
-    'docNumber', 'companyName', 'companyPhone', 'companyEmail', 
-    'companyAddress', 'clientName', 'clientAddress', 'clientMF', 'payment'
-];
-
-inputsToWatch.forEach(id => {
-    document.getElementById(id).addEventListener('input', update);
-});
-
-const f = n => (n||0).toFixed(3);
-pDate.innerText = new Date().toLocaleDateString();
-
-function updateCompany(){
-    const name = document.getElementById("companyName").value;
-    const phone = document.getElementById("companyPhone").value;
-    const email = document.getElementById("companyEmail").value;
-    const address = document.getElementById("companyAddress").value;
-    
-    let html = [];
-    if(name) html.push(`<strong>${name}</strong>`);
-    if(phone) html.push(phone);
-    if(email) html.push(email);
-    if(address) html.push(address);
-    
-    companyInfo.innerHTML = html.join("<br>");
-}
-
-function addRow(){
-    const tr = document.createElement("tr");
-
-    tr.innerHTML = `
-    <td><input type="text" placeholder="Item description"></td>
-    <td><input type="number" min="0" value="1"></td>
-    <td><input type="number" min="0" value="0.000" step="0.001"></td>
-    <td class="t-cell"><span class="t">0.000</span></td>
-    <td class="hide-on-export"><button class="delete-btn" onclick="this.closest('tr').remove();update()">✕</button></td>
-    `;
-
-    rowsEl.appendChild(tr);
-    tr.querySelectorAll("input").forEach(i => i.addEventListener("input", update));
-    update();
-}
-
-function update(){
-    let s = 0;
-
-    document.querySelectorAll("#rows tr").forEach(tr => {
-        let q = +tr.children[1].children[0].value || 0;
-        let p = +tr.children[2].children[0].value || 0;
-        let t = q * p;
-        tr.querySelector(".t").innerText = f(t);
-        s += t;
-    });
-
-    let v = s * 0.19;
-    let n = s + v + 1;
-
-    sub.innerText = f(s);
-    vat.innerText = f(v);
-    net.innerText = f(n);
-
-    const docNumVal = document.getElementById("docNumber").value;
-    pNumber.innerText = docNumVal ? "#" + docNumVal : "";
-
-    const cName = document.getElementById("clientName").value;
-    const cAddr = document.getElementById("clientAddress").value;
-    pClient.innerHTML = `${cName ? '<strong>'+cName+'</strong><br>' : ''}${cAddr}`;
-    
-    pPayment.innerText = document.getElementById("payment").value;
-    pMF.innerText = document.getElementById("clientMF").value;
-
-    updateCompany();
-}
-
-function exportPDF(){
+async function exportImage() {
     const element = document.getElementById('documentCard');
-    
-    // 1. Force strict A4 physical dimensions (fixes clipping)
     element.classList.add('is-exporting');
+    const replacements = prepareForExport();
 
-    // 2. Hide delete buttons
-    const deleteCells = document.querySelectorAll('.hide-on-export');
-    deleteCells.forEach(cell => cell.style.display = 'none');
-
-    // 3. Swap <input> fields for clean <span> text so HTML2Canvas reads it properly
-    const inputs = element.querySelectorAll('input');
-    inputs.forEach(input => {
-        const span = document.createElement('span');
-        span.className = 'export-span';
-        span.innerText = input.value || '-';
-        input.style.display = 'none';
-        input.parentNode.insertBefore(span, input);
+    // Use html2canvas directly (it's included in html2pdf bundle)
+    const canvas = await html2canvas(element, {
+        scale: 3,
+        useCORS: true,
+        backgroundColor: "#ffffff"
     });
 
-    const docNumVal = document.getElementById("docNumber").value || "Draft";
+    const link = document.createElement('a');
+    link.download = `VANOA-DN-${document.getElementById('docNumber').value || 'Draft'}.png`;
+    link.href = canvas.toDataURL("image/png");
+    link.click();
 
-    const opt = {
-        margin:       0, // We set margin to 0 because our 15px padding inside the A4 CSS IS the margin
-        filename:     `DeliveryNote-${docNumVal}.pdf`,
-        image:        { type: 'jpeg', quality: 1 },
-        html2canvas:  { 
-            scale: 2, 
-            useCORS: true, 
-            scrollY: 0,
-            scrollX: 0
-        },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-
-    html2pdf().set(opt).from(element).save().then(() => {
-        // 4. Restore the screen layout back to normal
-        element.classList.remove('is-exporting');
-        deleteCells.forEach(cell => cell.style.display = '');
-        document.querySelectorAll('.export-span').forEach(span => span.remove());
-        inputs.forEach(input => input.style.display = '');
-    });
+    cleanupAfterExport(replacements);
 }
 
+// Initialize
 addRow();
+update();
 </script>
-
-</body>
-</html>    padding: 24px;
-}
-
-.card {
-    width: 100%;
-    max-width: 800px; /* Safe width for scaling */
-    background: #fff;
-    margin: auto;
-    padding: 48px;
-    border-radius: 14px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-}
-
-/* EXPORT OVERRIDES (Makes it A4 safe) */
-.is-exporting {
-    max-width: none !important;
-    width: 790px !important; /* Fixed width to guarantee perfect A4 scaling */
-    padding: 30px !important;
-    box-shadow: none !important;
-    border-radius: 0 !important;
-}
-
-.export-span {
-    display: inline-block;
-    padding: 10px 0;
-    font-size: 14px;
-}
-
-/* HEADER */
-.header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 40px;
-}
-
-.logo img { width: 4.5cm; }
-
-.company {
-    font-size: 12px;
-    color: var(--muted);
-    margin-top: 6px;
-    line-height: 1.4;
-}
-
-.doc-title { text-align: right; }
-.doc-title h1 { margin: 0; font-size: 34px; font-weight: 800; }
-.doc-meta { font-size: 13px; color: var(--muted); }
-
-/* GRID */
-.grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 40px;
-    margin-bottom: 30px;
-}
-
-.block-title {
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    border-bottom: 2px solid #000;
-    display: inline-block;
-    margin-bottom: 10px;
-}
-
-/* TABLE */
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-th {
-    background: #000;
-    color: #fff;
-    padding: 12px;
-    font-size: 11px;
-    text-transform: uppercase;
-    text-align: left;
-}
-
-td {
-    padding: 12px;
-    border-bottom: 1px solid var(--line);
-    font-size: 14px;
-}
-
-td input {
-    margin: 0;
-    padding: 8px;
-    background: transparent;
-}
-
-.delete-btn {
-    background: #ff4d4d;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    padding: 4px 8px;
-    cursor: pointer;
-}
-
-/* TOTALS */
-.totals {
-    margin-top: 30px;
-    max-width: 320px;
-    margin-left: auto;
-}
-
-.row {
-    display: flex;
-    justify-content: space-between;
-    padding: 5px 0;
-}
-
-.grand {
-    border-top: 2px solid #000;
-    margin-top: 8px;
-    padding-top: 10px;
-    font-weight: 900;
-    font-size: 18px;
-}
-
-/* FOOTER */
-.footer {
-    margin-top: 40px;
-    display: flex;
-    justify-content: space-between;
-    font-size: 11px;
-    color: var(--muted);
-    border-top: 1px solid var(--line);
-    padding-top: 12px;
-}
-
-/* MOBILE */
-@media(max-width:900px){
-    .layout { flex-direction: column; }
-    .sidebar { width: 100%; }
-    .card { padding: 20px; }
-}
-</style>
-</head>
-
-<body>
-
-<div class="layout">
-
-<div class="sidebar" id="sidebar">
-
-<button class="toggle" onclick="toggle()">☰</button>
-
-<div class="content">
-
-<h3>Document</h3>
-<input id="docNumber" placeholder="Invoice Number">
-
-<h3>Company</h3>
-<input id="companyName" placeholder="Company Name">
-<input id="companyPhone" placeholder="Phone">
-<input id="companyEmail" placeholder="Email">
-<input id="companyAddress" placeholder="Address">
-
-<h3>Client</h3>
-<input id="clientName" placeholder="Client Name">
-<input id="clientAddress" placeholder="Client Address">
-<input id="clientMF" placeholder="MF (Tax ID)">
-
-<h3>Payment</h3>
-<select id="payment">
-<option>Cash</option>
-<option>Transfer</option>
-<option>Check</option>
-</select>
-
-<button onclick="addRow()" style="margin-top:15px; width:100%; padding:10px; cursor:pointer;">+ Add Item</button>
-<button onclick="exportPDF()" style="margin-top:10px; width:100%; padding:10px; background:#4CAF50; color:white; border:none; cursor:pointer; font-weight:bold;">Export PDF</button>
-
-</div>
-</div>
-
-<div class="main">
-
-<div class="card" id="documentCard">
-
-<div class="header">
-<div>
-<div class="logo">
-<img src="https://raw.githubusercontent.com/ShadowHD6/VANOA-Delivery-Note/main/VANOA%20Logo.svg" crossorigin="anonymous">
-</div>
-
-<div class="company" id="companyInfo"></div>
-</div>
-
-<div class="doc-title">
-<h1>Delivery Note</h1>
-<div class="doc-meta" id="pNumber"></div>
-<div class="doc-meta" id="pDate"></div>
-</div>
-</div>
-
-<div class="grid">
-<div>
-<div class="block-title">Billing To</div>
-<div id="pClient"></div>
-</div>
-
-<div>
-<div class="block-title">Client Details</div>
-<div>MF: <span id="pMF"></span></div>
-<div>Payment: <span id="pPayment"></span></div>
-</div>
-</div>
-
-<table>
-<thead>
-<tr>
-<th>Description</th>
-<th>Qty</th>
-<th>Unit</th>
-<th>Total</th>
-<th class="hide-on-export"></th>
-</tr>
-</thead>
-<tbody id="rows"></tbody>
-</table>
-
-<div class="totals">
-<div class="row"><span>Subtotal</span><span id="sub">0.000</span></div>
-<div class="row"><span>VAT 19%</span><span id="vat">0.000</span></div>
-<div class="row"><span>Stamp</span><span>1.000</span></div>
-<div class="row grand"><span>NET</span><span id="net">0.000</span></div>
-</div>
-
-<div class="footer">
-<div>www.vanoa.tn</div>
-<div>@vanoa</div>
-<div>MF: I304285/Z/A/M/000</div>
-</div>
-
-</div>
-</div>
-</div>
-
-<script>
-function toggle(){
-    document.getElementById("sidebar").classList.toggle("collapsed");
-}
-
-const rowsEl = document.getElementById("rows");
-const sub = document.getElementById("sub");
-const vat = document.getElementById("vat");
-const net = document.getElementById("net");
-
-const pNumber = document.getElementById("pNumber");
-const pDate = document.getElementById("pDate");
-const pClient = document.getElementById("pClient");
-const pPayment = document.getElementById("pPayment");
-const pMF = document.getElementById("pMF");
-const companyInfo = document.getElementById("companyInfo");
-
-// Setup real-time listeners
-const inputsToWatch = [
-    'docNumber', 'companyName', 'companyPhone', 'companyEmail', 
-    'companyAddress', 'clientName', 'clientAddress', 'clientMF', 'payment'
-];
-
-inputsToWatch.forEach(id => {
-    document.getElementById(id).addEventListener('input', update);
-});
-
-const f = n => (n||0).toFixed(3);
-pDate.innerText = new Date().toLocaleDateString();
-
-function updateCompany(){
-    const name = document.getElementById("companyName").value;
-    const phone = document.getElementById("companyPhone").value;
-    const email = document.getElementById("companyEmail").value;
-    const address = document.getElementById("companyAddress").value;
-    
-    let html = [];
-    if(name) html.push(`<strong>${name}</strong>`);
-    if(phone) html.push(phone);
-    if(email) html.push(email);
-    if(address) html.push(address);
-    
-    companyInfo.innerHTML = html.join("<br>");
-}
-
-function addRow(){
-    const tr = document.createElement("tr");
-
-    tr.innerHTML = `
-    <td><input type="text" placeholder="Item description"></td>
-    <td><input type="number" min="0" value="1"></td>
-    <td><input type="number" min="0" value="0.000" step="0.001"></td>
-    <td class="t">0.000</td>
-    <td class="hide-on-export"><button class="delete-btn" onclick="this.closest('tr').remove();update()">✕</button></td>
-    `;
-
-    rowsEl.appendChild(tr);
-    tr.querySelectorAll("input").forEach(i => i.addEventListener("input", update));
-    update();
-}
-
-function update(){
-    let s = 0;
-
-    document.querySelectorAll("#rows tr").forEach(tr => {
-        let q = +tr.children[1].children[0].value || 0;
-        let p = +tr.children[2].children[0].value || 0;
-        let t = q * p;
-        tr.querySelector(".t").innerText = f(t);
-        s += t;
-    });
-
-    let v = s * 0.19;
-    let n = s + v + 1;
-
-    sub.innerText = f(s);
-    vat.innerText = f(v);
-    net.innerText = f(n);
-
-    const docNumVal = document.getElementById("docNumber").value;
-    pNumber.innerText = docNumVal ? "#" + docNumVal : "";
-
-    const cName = document.getElementById("clientName").value;
-    const cAddr = document.getElementById("clientAddress").value;
-    pClient.innerHTML = `${cName ? '<strong>'+cName+'</strong><br>' : ''}${cAddr}`;
-    
-    pPayment.innerText = document.getElementById("payment").value;
-    pMF.innerText = document.getElementById("clientMF").value;
-
-    updateCompany();
-}
-
-function exportPDF(){
-    const element = document.getElementById('documentCard');
-    
-    // 1. Force A4 safe dimensions
-    element.classList.add('is-exporting');
-
-    // 2. Hide delete buttons
-    const deleteCells = document.querySelectorAll('.hide-on-export');
-    deleteCells.forEach(cell => cell.style.display = 'none');
-
-    // 3. Swap <input> fields for clean <span> text to fix table layout issues in PDF
-    const inputs = element.querySelectorAll('input');
-    inputs.forEach(input => {
-        const span = document.createElement('span');
-        span.className = 'export-span';
-        span.innerText = input.value || '-';
-        input.style.display = 'none';
-        input.parentNode.insertBefore(span, input);
-    });
-
-    const docNumVal = document.getElementById("docNumber").value || "Draft";
-
-    const opt = {
-        margin:       10, // Gives a safe 10mm margin on all sides of the A4 paper
-        filename:     `DeliveryNote-${docNumVal}.pdf`,
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { 
-            scale: 2, 
-            useCORS: true, 
-            scrollY: 0 
-        },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-
-    html2pdf().set(opt).from(element).save().then(() => {
-        // 4. Restore everything back to normal for the web view
-        element.classList.remove('is-exporting');
-        deleteCells.forEach(cell => cell.style.display = '');
-        document.querySelectorAll('.export-span').forEach(span => span.remove());
-        inputs.forEach(input => input.style.display = '');
-    });
-}
-
-addRow();
-</script>
-
 </body>
 </html>
