@@ -6,176 +6,185 @@
 
 <title>VANOA Delivery Note</title>
 
-<link rel="icon" type="image/svg+xml"
-href="https://raw.githubusercontent.com/ShadowHD6/VANOA-Delivery-Note/main/Vanoa%20Favicom.svg">
+<link rel="icon" type="image/svg+xml" href="https://cdn.jsdelivr.net/gh/ShadowHD6/VANOA-Delivery-Note@main/Vanoa%20Favicom.svg">
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <style>
-:root{
-    --bg:#f6f7f9;
-    --card:#ffffff;
-    --text:#111;
-    --muted:#6b7280;
-    --line:#e5e7eb;
+:root {
+    --bg: #f6f7f9;
+    --card: #ffffff;
+    --text: #111;
+    --muted: #6b7280;
+    --line: #e5e7eb;
 }
 
-*{box-sizing:border-box}
+* { box-sizing: border-box; }
 
-body{
-    margin:0;
-    font-family:Inter, sans-serif;
-    background:var(--bg);
-    color:var(--text);
+body {
+    margin: 0;
+    font-family: Inter, sans-serif;
+    background: var(--bg);
+    color: var(--text);
 }
 
-.layout{
-    display:flex;
-    min-height:100vh;
+.layout {
+    display: flex;
+    min-height: 100vh;
 }
 
 /* SIDEBAR */
-.sidebar{
-    width:340px;
-    background:#0a0a0a;
-    color:#fff;
-    padding:18px;
-    transition:0.3s;
+.sidebar {
+    width: 340px;
+    background: #0a0a0a;
+    color: #fff;
+    padding: 18px;
+    transition: 0.3s;
 }
 
-.sidebar.collapsed{width:70px;}
-.sidebar.collapsed .content{display:none;}
+.sidebar.collapsed { width: 70px; }
+.sidebar.collapsed .content { display: none; }
 
-.toggle{
-    width:100%;
-    padding:10px;
-    background:#fff;
-    border:none;
-    font-weight:700;
-    cursor:pointer;
-    margin-bottom:12px;
+.toggle {
+    width: 100%;
+    padding: 10px;
+    background: #fff;
+    border: none;
+    font-weight: 700;
+    cursor: pointer;
+    margin-bottom: 12px;
 }
 
-input,select{
-    width:100%;
-    padding:10px;
-    margin-top:6px;
-    border-radius:8px;
-    border:none;
-    outline:none;
+input, select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 6px;
+    border-radius: 8px;
+    border: none;
+    outline: none;
 }
 
 /* MAIN */
-.main{
-    flex:1;
-    padding:24px;
+.main {
+    flex: 1;
+    padding: 24px;
 }
 
-.card{
-    max-width:900px;
-    background:#fff;
-    margin:auto;
-    padding:48px;
-    border-radius:14px;
-    box-shadow:0 10px 30px rgba(0,0,0,0.05);
+.card {
+    max-width: 900px;
+    background: #fff;
+    margin: auto;
+    padding: 48px;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
 }
 
 /* HEADER */
-.header{
-    display:flex;
-    justify-content:space-between;
-    margin-bottom:40px;
+.header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 40px;
 }
 
-.logo img{width:4.5cm;}
+.logo img { width: 4.5cm; }
 
-.company{
-    font-size:12px;
-    color:var(--muted);
-    margin-top:6px;
-    line-height:1.4;
+.company {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 6px;
+    line-height: 1.4;
 }
 
-.doc-title{text-align:right;}
-.doc-title h1{margin:0;font-size:34px;font-weight:800;}
-.doc-meta{font-size:13px;color:var(--muted);}
+.doc-title { text-align: right; }
+.doc-title h1 { margin: 0; font-size: 34px; font-weight: 800; }
+.doc-meta { font-size: 13px; color: var(--muted); }
 
 /* GRID */
-.grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:40px;
-    margin-bottom:30px;
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 30px;
 }
 
-.block-title{
-    font-size:11px;
-    font-weight:700;
-    text-transform:uppercase;
-    border-bottom:2px solid #000;
-    display:inline-block;
-    margin-bottom:10px;
+.block-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    border-bottom: 2px solid #000;
+    display: inline-block;
+    margin-bottom: 10px;
 }
 
 /* TABLE */
-table{
-    width:100%;
-    border-collapse:collapse;
+table {
+    width: 100%;
+    border-collapse: collapse;
 }
 
-th{
-    background:#000;
-    color:#fff;
-    padding:12px;
-    font-size:11px;
-    text-transform:uppercase;
+th {
+    background: #000;
+    color: #fff;
+    padding: 12px;
+    font-size: 11px;
+    text-transform: uppercase;
+    text-align: left;
 }
 
-td{
-    padding:12px;
-    border-bottom:1px solid var(--line);
-    font-size:14px;
+td {
+    padding: 12px;
+    border-bottom: 1px solid var(--line);
+    font-size: 14px;
+}
+
+.delete-btn {
+    background: #ff4d4d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 8px;
+    cursor: pointer;
 }
 
 /* TOTALS */
-.totals{
-    margin-top:30px;
-    max-width:320px;
-    margin-left:auto;
+.totals {
+    margin-top: 30px;
+    max-width: 320px;
+    margin-left: auto;
 }
 
-.row{
-    display:flex;
-    justify-content:space-between;
-    padding:5px 0;
+.row {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
 }
 
-.grand{
-    border-top:2px solid #000;
-    margin-top:8px;
-    padding-top:10px;
-    font-weight:900;
-    font-size:18px;
+.grand {
+    border-top: 2px solid #000;
+    margin-top: 8px;
+    padding-top: 10px;
+    font-weight: 900;
+    font-size: 18px;
 }
 
 /* FOOTER */
-.footer{
-    margin-top:40px;
-    display:flex;
-    justify-content:space-between;
-    font-size:11px;
-    color:var(--muted);
-    border-top:1px solid var(--line);
-    padding-top:12px;
+.footer {
+    margin-top: 40px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--muted);
+    border-top: 1px solid var(--line);
+    padding-top: 12px;
 }
 
 /* MOBILE */
 @media(max-width:900px){
-    .layout{flex-direction:column}
-    .sidebar{width:100%}
-    .card{padding:20px}
+    .layout { flex-direction: column; }
+    .sidebar { width: 100%; }
+    .card { padding: 20px; }
 }
 </style>
 </head>
@@ -184,7 +193,6 @@ td{
 
 <div class="layout">
 
-<!-- SIDEBAR -->
 <div class="sidebar" id="sidebar">
 
 <button class="toggle" onclick="toggle()">☰</button>
@@ -203,8 +211,6 @@ td{
 <h3>Client</h3>
 <input id="clientName" placeholder="Client Name">
 <input id="clientAddress" placeholder="Client Address">
-
-<!-- ✅ NEW FIELD ADDED -->
 <input id="clientMF" placeholder="MF (Tax ID)">
 
 <h3>Payment</h3>
@@ -214,22 +220,20 @@ td{
 <option>Check</option>
 </select>
 
-<button onclick="addRow()">+ Add Item</button>
-<button onclick="exportPDF()">Export PDF</button>
+<button onclick="addRow()" style="margin-top:15px; width:100%; padding:10px; cursor:pointer;">+ Add Item</button>
+<button onclick="exportPDF()" style="margin-top:10px; width:100%; padding:10px; background:#4CAF50; color:white; border:none; cursor:pointer; font-weight:bold;">Export PDF</button>
 
 </div>
 </div>
 
-<!-- MAIN -->
 <div class="main">
 
-<div class="card">
+<div class="card" id="documentCard">
 
 <div class="header">
-
 <div>
 <div class="logo">
-<img src="https://raw.githubusercontent.com/ShadowHD6/VANOA-Delivery-Note/main/VANOA%20Logo.svg">
+<img src="https://raw.githubusercontent.com/ShadowHD6/VANOA-Delivery-Note/main/VANOA%20Logo.svg" crossorigin="anonymous">
 </div>
 
 <div class="company" id="companyInfo"></div>
@@ -240,11 +244,9 @@ td{
 <div class="doc-meta" id="pNumber"></div>
 <div class="doc-meta" id="pDate"></div>
 </div>
-
 </div>
 
 <div class="grid">
-
 <div>
 <div class="block-title">Billing To</div>
 <div id="pClient"></div>
@@ -252,12 +254,9 @@ td{
 
 <div>
 <div class="block-title">Client Details</div>
-
 <div>MF: <span id="pMF"></span></div>
 <div>Payment: <span id="pPayment"></span></div>
-
 </div>
-
 </div>
 
 <table>
@@ -267,7 +266,7 @@ td{
 <th>Qty</th>
 <th>Unit</th>
 <th>Total</th>
-<th></th>
+<th class="hide-on-export"></th>
 </tr>
 </thead>
 <tbody id="rows"></tbody>
@@ -291,119 +290,121 @@ td{
 </div>
 
 <script>
-const { jsPDF } = window.jspdf;
-
 function toggle(){
-document.getElementById("sidebar").classList.toggle("collapsed");
+    document.getElementById("sidebar").classList.toggle("collapsed");
 }
 
-const rowsEl=document.getElementById("rows");
+const rowsEl = document.getElementById("rows");
+const sub = document.getElementById("sub");
+const vat = document.getElementById("vat");
+const net = document.getElementById("net");
 
-const sub=document.getElementById("sub");
-const vat=document.getElementById("vat");
-const net=document.getElementById("net");
+const pNumber = document.getElementById("pNumber");
+const pDate = document.getElementById("pDate");
+const pClient = document.getElementById("pClient");
+const pPayment = document.getElementById("pPayment");
+const pMF = document.getElementById("pMF");
+const companyInfo = document.getElementById("companyInfo");
 
-const pNumber=document.getElementById("pNumber");
-const pDate=document.getElementById("pDate");
-const pClient=document.getElementById("pClient");
-const pPayment=document.getElementById("pPayment");
-const pMF=document.getElementById("pMF");
+// Setup real-time listeners for all sidebar inputs
+const inputsToWatch = [
+    'docNumber', 'companyName', 'companyPhone', 'companyEmail', 
+    'companyAddress', 'clientName', 'clientAddress', 'clientMF', 'payment'
+];
 
-const companyInfo=document.getElementById("companyInfo");
+inputsToWatch.forEach(id => {
+    document.getElementById(id).addEventListener('input', update);
+});
 
-const docNumber=document.getElementById("docNumber");
-
-const companyName=document.getElementById("companyName");
-const companyPhone=document.getElementById("companyPhone");
-const companyEmail=document.getElementById("companyEmail");
-const companyAddress=document.getElementById("companyAddress");
-
-const clientName=document.getElementById("clientName");
-const clientAddress=document.getElementById("clientAddress");
-const clientMF=document.getElementById("clientMF");
-
-const payment=document.getElementById("payment");
-
-const f=n=>(n||0).toFixed(3);
-
-pDate.innerText=new Date().toLocaleDateString();
+const f = n => (n||0).toFixed(3);
+pDate.innerText = new Date().toLocaleDateString();
 
 function updateCompany(){
-companyInfo.innerHTML=
-`${companyName.value}<br>
-${companyPhone.value}<br>
-${companyEmail.value}<br>
-${companyAddress.value}`;
+    const name = document.getElementById("companyName").value;
+    const phone = document.getElementById("companyPhone").value;
+    const email = document.getElementById("companyEmail").value;
+    const address = document.getElementById("companyAddress").value;
+    
+    let html = [];
+    if(name) html.push(`<strong>${name}</strong>`);
+    if(phone) html.push(phone);
+    if(email) html.push(email);
+    if(address) html.push(address);
+    
+    companyInfo.innerHTML = html.join("<br>");
 }
 
 function addRow(){
-const tr=document.createElement("tr");
+    const tr = document.createElement("tr");
 
-tr.innerHTML=`
-<td><input></td>
-<td><input type="number"></td>
-<td><input type="number"></td>
-<td class="t">0.000</td>
-<td><button onclick="this.closest('tr').remove();update()">✕</button></td>
-`;
+    tr.innerHTML = `
+    <td><input type="text" placeholder="Item description"></td>
+    <td><input type="number" min="0" value="1"></td>
+    <td><input type="number" min="0" value="0.000" step="0.001"></td>
+    <td class="t">0.000</td>
+    <td class="hide-on-export"><button class="delete-btn" onclick="this.closest('tr').remove();update()">✕</button></td>
+    `;
 
-rowsEl.appendChild(tr);
-tr.querySelectorAll("input").forEach(i=>i.addEventListener("input",update));
-update();
+    rowsEl.appendChild(tr);
+    tr.querySelectorAll("input").forEach(i => i.addEventListener("input", update));
+    update();
 }
 
 function update(){
-let s=0;
+    let s = 0;
 
-document.querySelectorAll("#rows tr").forEach(tr=>{
-let q=+tr.children[1].children[0].value||0;
-let p=+tr.children[2].children[0].value||0;
-let t=q*p;
-tr.querySelector(".t").innerText=f(t);
-s+=t;
-});
+    document.querySelectorAll("#rows tr").forEach(tr => {
+        let q = +tr.children[1].children[0].value || 0;
+        let p = +tr.children[2].children[0].value || 0;
+        let t = q * p;
+        tr.querySelector(".t").innerText = f(t);
+        s += t;
+    });
 
-let v=s*0.19;
-let n=s+v+1;
+    let v = s * 0.19;
+    let n = s + v + 1;
 
-sub.innerText=f(s);
-vat.innerText=f(v);
-net.innerText=f(n);
+    sub.innerText = f(s);
+    vat.innerText = f(v);
+    net.innerText = f(n);
 
-pNumber.innerText="#"+docNumber.value;
+    const docNumVal = document.getElementById("docNumber").value;
+    pNumber.innerText = docNumVal ? "#" + docNumVal : "";
 
-pClient.innerHTML=`${clientName.value}<br>${clientAddress.value}`;
-pPayment.innerText=payment.value;
-pMF.innerText=clientMF.value;
+    const cName = document.getElementById("clientName").value;
+    const cAddr = document.getElementById("clientAddress").value;
+    pClient.innerHTML = `${cName ? '<strong>'+cName+'</strong><br>' : ''}${cAddr}`;
+    
+    pPayment.innerText = document.getElementById("payment").value;
+    pMF.innerText = document.getElementById("clientMF").value;
 
-updateCompany();
+    updateCompany();
 }
 
 function exportPDF(){
-const pdf=new jsPDF("p","mm","a4");
+    // Temporarily hide delete buttons from the PDF
+    const deleteCells = document.querySelectorAll('.hide-on-export');
+    deleteCells.forEach(cell => cell.style.display = 'none');
 
-pdf.setFontSize(18);
-pdf.text("Delivery Note",140,20);
-pdf.setFontSize(10);
-pdf.text("#"+docNumber.value,140,28);
+    const element = document.getElementById('documentCard');
+    const docNumVal = document.getElementById("docNumber").value || "Draft";
 
-pdf.text(clientName.value,20,60);
-pdf.text(clientAddress.value,20,66);
-pdf.text("MF: "+clientMF.value,20,72);
+    const opt = {
+        margin:       [10, 0, 10, 0],
+        filename:     `DeliveryNote-${docNumVal}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { 
+            scale: 2, 
+            useCORS: true, // Crucial for external images/logos!
+            windowWidth: element.scrollWidth // Ensures correct wrapping
+        },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
 
-let y=90;
-
-document.querySelectorAll("#rows tr").forEach(tr=>{
-pdf.text(tr.children[0].children[0].value||"-",20,y);
-pdf.text(tr.children[1].children[0].value||"0",100,y);
-pdf.text(tr.children[2].children[0].value||"0",130,y);
-pdf.text(tr.querySelector(".t").innerText,160,y);
-y+=8;
-});
-
-pdf.text("NET: "+net.innerText,140,y+10);
-
-pdf.save("DeliveryNote-"+docNumber.value+".pdf");
+    html2pdf().set(opt).from(element).save().then(() => {
+        // Restore delete buttons after generation
+        deleteCells.forEach(cell => cell.style.display = '');
+    });
 }
 
 addRow();
