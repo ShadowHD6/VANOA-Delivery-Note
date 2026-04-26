@@ -38,7 +38,6 @@ body {
     position: sticky;
     top: 0;
     overflow-y: auto;
-    z-index: 10;
 }
 
 .sidebar.collapsed { width: 70px; }
@@ -63,13 +62,406 @@ input, select {
     outline: none;
 }
 
-/* MAIN PREVIEW AREA */
+/* MAIN */
 .main {
     flex: 1;
     padding: 40px;
     display: flex;
     justify-content: center;
     background: #525659;
+}
+
+/* A4 */
+.card {
+    width: 210mm;
+    height: 297mm;
+    background: #fff;
+    padding: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.card-inner {
+    border: 1mm solid #000;
+    height: 100%;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: visible;
+}
+
+/* HEADER */
+.header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 40px;
+}
+
+.logo img {
+    width: 4.5cm;
+    max-height: 90px;
+    object-fit: contain;
+    display: block;
+}
+
+.doc-title { text-align: right; }
+.doc-title h1 { margin: 0; font-size: 34px; font-weight: 900; }
+.doc-meta { font-size: 13px; color: var(--muted); }
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 55px;
+}
+
+.block-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    border-bottom: 2px solid #000;
+    display: inline-block;
+    margin-bottom: 10px;
+}
+
+table { width: 100%; border-collapse: collapse; }
+
+th {
+    background: #000;
+    color: #fff;
+    padding: 12px;
+    font-size: 11px;
+    text-transform: uppercase;
+    text-align: left;
+}
+
+td {
+    border-bottom: 1px solid var(--line);
+    font-size: 14px;
+    padding: 0;
+}
+
+td input {
+    padding: 12px;
+    width: 100%;
+    border: none;
+    outline: none;
+}
+
+.spacer { flex-grow: 1; }
+
+.totals-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: auto;
+    margin-bottom: 100px;
+}
+
+.totals { width: 300px; }
+
+.row {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+}
+
+.grand {
+    border-top: 2px solid #000;
+    margin-top: 8px;
+    padding-top: 10px;
+    font-weight: 900;
+    font-size: 18px;
+}
+
+.footer {
+    position: absolute;
+    bottom: 20px;
+    left: 40px;
+    right: 40px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--muted);
+    border-top: 1px solid var(--line);
+    padding-top: 12px;
+}
+
+.delete-btn {
+    background: #ff4d4d;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.is-exporting { box-shadow: none !important; }
+</style>
+</head>
+
+<body>
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+    <button class="toggle" onclick="toggle()">☰</button>
+
+    <div class="content">
+        <h3>Document</h3>
+        <input id="docNumber">
+
+        <h3>Company</h3>
+        <input id="companyName">
+        <input id="companyPhone">
+        <input id="companyEmail">
+        <input id="companyAddress">
+
+        <h3>Client</h3>
+        <input id="clientName">
+        <input id="clientAddress">
+        <input id="clientMF">
+
+        <h3>Payment</h3>
+        <select id="payment">
+            <option>Cash</option>
+            <option>Transfer</option>
+            <option>Check</option>
+        </select>
+
+        <button onclick="addItem()">+ Add Item</button>
+        <button onclick="exportPDF()">Export PDF</button>
+    </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+<div class="card" id="documentCard">
+<div class="card-inner">
+
+<!-- HEADER -->
+<div class="header">
+    <div>
+        <div class="logo">
+            <img src="https://raw.githubusercontent.com/ShadowHD6/VANOA-Delivery-Note/main/VANOA%20Logo.svg" crossorigin="anonymous">
+        </div>
+        <div id="companyPreview"></div>
+    </div>
+
+    <div class="doc-title">
+        <h1>Delivery Note</h1>
+        <div class="doc-meta" id="docNo"></div>
+        <div class="doc-meta" id="docDate"></div>
+    </div>
+</div>
+
+<!-- CLIENT -->
+<div class="grid">
+    <div>
+        <div class="block-title">Billing To</div>
+        <div id="clientPreview"></div>
+    </div>
+
+    <div>
+        <div class="block-title">Details</div>
+        <div>MF: <span id="mfPreview"></span></div>
+        <div>Payment: <span id="paymentPreview"></span></div>
+    </div>
+</div>
+
+<!-- TABLE -->
+<table>
+<thead>
+<tr>
+    <th>Description</th>
+    <th>Qty</th>
+    <th>Unit</th>
+    <th>Total</th>
+    <th></th>
+</tr>
+</thead>
+<tbody id="items"></tbody>
+</table>
+
+<div class="spacer"></div>
+
+<!-- TOTALS -->
+<div class="totals-wrapper">
+    <div class="totals">
+        <div class="row"><span>Subtotal</span><span id="subtotal">0.000</span></div>
+        <div class="row"><span>VAT 19%</span><span id="vat">0.000</span></div>
+        <div class="row"><span>Stamp</span><span>1.000</span></div>
+        <div class="row grand"><span>NET</span><span id="net">0.000</span></div>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+    <div>www.vanoa.net</div>
+    <div>@vanoa</div>
+    <div>MF: I304285/Z/A/M/000</div>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+<script>
+/* =========================
+   STATE (SOURCE OF TRUTH)
+========================= */
+
+const state = {
+    docNumber: "0001",
+    company: { name:"VANOA", phone:"", email:"", address:"" },
+    client: { name:"", address:"", mf:"" },
+    payment: "Cash",
+    items: [],
+    tax: 0.19,
+    stamp: 1
+};
+
+/* =========================
+   HELPERS
+========================= */
+
+const $ = (id) => document.getElementById(id);
+
+function num(v){
+    return parseFloat(v) || 0;
+}
+
+/* =========================
+   CALCULATIONS
+========================= */
+
+function totals(){
+    const sub = state.items.reduce((s,i)=>s + i.qty*i.unit,0);
+    const vat = sub * state.tax;
+    return {
+        sub,
+        vat,
+        net: sub + vat + state.stamp
+    };
+}
+
+/* =========================
+   RENDER
+========================= */
+
+function render(){
+
+    docNo.innerText = "#" + state.docNumber;
+    docDate.innerText = new Date().toLocaleDateString();
+
+    companyPreview.innerHTML =
+        `<strong>${state.company.name}</strong><br>${state.company.phone}<br>${state.company.email}`;
+
+    clientPreview.innerHTML =
+        `<strong>${state.client.name}</strong><br>${state.client.address}`;
+
+    mfPreview.innerText = state.client.mf;
+    paymentPreview.innerText = state.payment;
+
+    /* ITEMS */
+    items.innerHTML = "";
+
+    state.items.forEach((i,idx)=>{
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+            <td><input value="${i.desc}" oninput="upd(${idx},'desc',this.value)"></td>
+            <td><input type="number" value="${i.qty}" oninput="upd(${idx},'qty',this.value)"></td>
+            <td><input type="number" value="${i.unit}" step="0.001" oninput="upd(${idx},'unit',this.value)"></td>
+            <td>${(i.qty*i.unit).toFixed(3)}</td>
+            <td><button class="delete-btn" onclick="del(${idx})">✕</button></td>
+        `;
+        items.appendChild(tr);
+    });
+
+    const t = totals();
+
+    subtotal.innerText = t.sub.toFixed(3);
+    vat.innerText = t.vat.toFixed(3);
+    net.innerText = t.net.toFixed(3);
+}
+
+/* =========================
+   ACTIONS
+========================= */
+
+function addItem(){
+    state.items.push({desc:"",qty:1,unit:0});
+    render();
+}
+
+function upd(i,key,val){
+    state.items[i][key] = key==="desc"?val:num(val);
+    render();
+}
+
+function del(i){
+    state.items.splice(i,1);
+    render();
+}
+
+/* =========================
+   INPUT BINDING
+========================= */
+
+docNumber.oninput = e=>{ state.docNumber=e.target.value; render(); };
+companyName.oninput = e=>{ state.company.name=e.target.value; render(); };
+companyPhone.oninput = e=>{ state.company.phone=e.target.value; render(); };
+companyEmail.oninput = e=>{ state.company.email=e.target.value; render(); };
+companyAddress.oninput = e=>{ state.company.address=e.target.value; render(); };
+
+clientName.oninput = e=>{ state.client.name=e.target.value; render(); };
+clientAddress.oninput = e=>{ state.client.address=e.target.value; render(); };
+clientMF.oninput = e=>{ state.client.mf=e.target.value; render(); };
+
+payment.oninput = e=>{ state.payment=e.target.value; render(); };
+
+/* =========================
+   EXPORT (FIXED PDF)
+========================= */
+
+function exportPDF(){
+
+    const el = document.getElementById("documentCard");
+    el.classList.add("is-exporting");
+
+    html2pdf().set({
+        margin:0,
+        filename:"DeliveryNote.pdf",
+        image:{type:"jpeg",quality:1},
+        html2canvas:{
+            scale:2,
+            useCORS:true,
+            scrollX:0,
+            scrollY:0,
+            windowWidth:el.scrollWidth
+        },
+        jsPDF:{unit:"mm",format:"a4",orientation:"portrait"}
+    }).from(el).save().then(()=>{
+        el.classList.remove("is-exporting");
+    });
+}
+
+/* =========================
+   INIT
+========================= */
+
+function toggle(){
+    sidebar.classList.toggle("collapsed");
+}
+
+addItem();
+render();
+
+</script>
+
+</body>
+</html>    background: #525659;
 }
 
 /* A4 CONTAINER */
@@ -248,7 +640,7 @@ td input { background: transparent; padding: 12px; }
                 </div>
 
                 <div class="footer">
-                    <div>www.vanoa.tn</div>
+                    <div>www.vanoa.net</div>
                     <div>@vanoa</div>
                     <div>MF: I304285/Z/A/M/000</div>
                 </div>
@@ -608,7 +1000,7 @@ td input {
         </div>
 
         <div class="footer">
-        <div>www.vanoa.tn</div>
+        <div>www.vanoa.net</div>
         <div>@vanoa</div>
         <div>MF: I304285/Z/A/M/000</div>
         </div>
@@ -992,7 +1384,7 @@ td input {
 </div>
 
 <div class="footer">
-<div>www.vanoa.tn</div>
+<div>www.vanoa.net</div>
 <div>@vanoa</div>
 <div>MF: I304285/Z/A/M/000</div>
 </div>
