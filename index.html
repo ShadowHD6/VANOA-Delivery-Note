@@ -6,6 +6,10 @@
 
 <title>VANOA Delivery Note</title>
 
+<!-- FAVICON -->
+<link rel="icon" type="image/svg+xml"
+href="https://raw.githubusercontent.com/ShadowHD6/VANOA-Delivery-Note/main/Vanoa%20Favicom.svg">
+
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -25,7 +29,7 @@ body{
     background:#f5f5f5;
 }
 
-/* APP LAYOUT */
+/* LAYOUT */
 .container{
     display:flex;
     min-height:100vh;
@@ -83,9 +87,7 @@ body{
     position:relative;
 }
 
-/* =========================
-   PREMIUM SAAS HEADER
-========================= */
+/* ===== PREMIUM HEADER ===== */
 
 .header{
     display:flex;
@@ -94,7 +96,7 @@ body{
     margin-bottom:45px;
 }
 
-/* LEFT BRAND BLOCK */
+/* BRAND */
 .brand{
     display:flex;
     gap:14px;
@@ -105,10 +107,9 @@ body{
 .brand img{
     width:4.5cm;
     height:auto;
-    object-fit:contain;
 }
 
-/* BRAND TEXT */
+/* TEXT */
 .brand-text{
     display:flex;
     flex-direction:column;
@@ -116,7 +117,7 @@ body{
 
 .brand-title{
     font-size:14px;
-    font-weight:700;
+    font-weight:800;
     letter-spacing:1px;
     text-transform:uppercase;
 }
@@ -128,7 +129,7 @@ body{
     line-height:1.4;
 }
 
-/* RIGHT DOC INFO */
+/* DOC INFO */
 .doc-info{
     text-align:right;
 }
@@ -181,7 +182,6 @@ th{
     color:#fff;
     font-size:11px;
     text-transform:uppercase;
-    letter-spacing:1px;
     padding:12px;
 }
 
@@ -265,7 +265,7 @@ td{
 
 <!-- DOCUMENT -->
 <div class="preview">
-<div class="doc" id="doc">
+<div class="doc">
 
 <!-- HEADER -->
 <div class="header">
@@ -276,8 +276,8 @@ td{
 <div class="brand-text">
 <div class="brand-title">VANOA Studio</div>
 <div class="brand-sub">
-+216 52 287 812<br>
-contact@vanoa.net<br>
++216 XX XXX XXX<br>
+contact@vanoa.tn<br>
 Tunisia
 </div>
 </div>
@@ -330,9 +330,9 @@ Tunisia
 
 <!-- FOOTER -->
 <div class="footer">
-<div>www.vanoa.net</div>
+<div>www.vanoa.tn</div>
 <div>@vanoa</div>
-<div>MF: 00000/Z/A/M/000</div>
+<div>MF: I304285/Z/A/M/000</div>
 </div>
 
 </div>
@@ -389,101 +389,72 @@ function removeRow(btn){
 
 /* UPDATE */
 function update(){
-    let subtotal = 0;
+    let subtotal=0;
 
     document.querySelectorAll("#rows tr").forEach(tr=>{
-        let q = +tr.children[1].children[0].value || 0;
-        let p = +tr.children[2].children[0].value || 0;
+        let q = +tr.children[1].children[0].value||0;
+        let p = +tr.children[2].children[0].value||0;
         let t = q*p;
 
         tr.querySelector(".t").innerText = f(t);
-        subtotal += t;
+        subtotal+=t;
     });
 
-    let vat = subtotal * 0.19;
-    let net = subtotal + vat + 1;
+    let vat = subtotal*0.19;
+    let net = subtotal+vat+1;
 
-    sub.innerText = f(subtotal);
-    vatEl.innerText = f(vat);
-    netEl.innerText = f(net);
+    sub.innerText=f(subtotal);
+    vatEl.innerText=f(vat);
+    netEl.innerText=f(net);
 
-    pNumber.innerText = "#" + docNumber.value;
+    pNumber.innerText="#"+docNumber.value;
 
-    pClient.innerHTML = `${clientName.value}<br>${clientAddress.value}`;
-    pTax.innerText = taxId.value;
-    pPayment.innerText = payment.value;
+    pClient.innerHTML=`${clientName.value}<br>${clientAddress.value}`;
+    pTax.innerText=taxId.value;
+    pPayment.innerText=payment.value;
 }
 
-/* ===== TRUE VECTOR PDF EXPORT (NO SCREENSHOT) ===== */
+/* VECTOR PDF EXPORT */
 function exportPDF(){
-
     const pdf = new jsPDF("p","mm","a4");
 
-    const margin = 20;
     let y = 20;
 
-    // HEADER
     pdf.setFont("helvetica","bold");
     pdf.setFontSize(22);
-    pdf.text("Delivery Note", 150, y);
+    pdf.text("Delivery Note", 140, y);
 
     pdf.setFontSize(10);
-    pdf.setFont("helvetica","normal");
-    pdf.text("#" + docNumber.value, 150, y+8);
-    pdf.text(pDate.innerText, 150, y+14);
+    pdf.text("#"+docNumber.value, 140, y+8);
+    pdf.text(pDate.innerText, 140, y+14);
 
-    // CLIENT
-    y += 25;
-    pdf.setFontSize(12);
+    y+=25;
+
     pdf.setFont("helvetica","bold");
-    pdf.text("Billing To", margin, y);
+    pdf.text("Billing To", 20, y);
 
     pdf.setFont("helvetica","normal");
-    pdf.setFontSize(10);
-    pdf.text(clientName.value, margin, y+8);
-    pdf.text(clientAddress.value, margin, y+14);
+    pdf.text(clientName.value, 20, y+8);
+    pdf.text(clientAddress.value, 20, y+14);
 
-    // ITEMS HEADER
-    y += 30;
-    pdf.setFont("helvetica","bold");
-    pdf.text("Description", margin, y);
-    pdf.text("Qty", 100, y);
-    pdf.text("Unit", 130, y);
-    pdf.text("Total", 160, y);
-
-    pdf.setFont("helvetica","normal");
-
-    let rowY = y + 8;
+    y+=30;
 
     document.querySelectorAll("#rows tr").forEach(tr=>{
-        const desc = tr.children[0].children[0].value;
-        const qty = tr.children[1].children[0].value;
-        const price = tr.children[2].children[0].value;
-        const total = qty * price;
-
-        pdf.text(desc || "-", margin, rowY);
-        pdf.text(String(qty || 0), 100, rowY);
-        pdf.text(String(price || 0), 130, rowY);
-        pdf.text(f(total), 160, rowY);
-
-        rowY += 8;
+        pdf.text(tr.children[0].children[0].value||"-", 20, y);
+        pdf.text(tr.children[1].children[0].value||"0", 100, y);
+        pdf.text(tr.children[2].children[0].value||"0", 130, y);
+        pdf.text(tr.querySelector(".t").innerText, 160, y);
+        y+=8;
     });
 
-    // TOTALS
-    rowY += 10;
+    y+=10;
 
-    pdf.setFont("helvetica","bold");
-    pdf.text("Subtotal: " + sub.innerText, 130, rowY);
-    pdf.text("VAT: " + vatEl.innerText, 130, rowY+6);
-    pdf.text("Stamp: 1.000", 130, rowY+12);
-    pdf.text("NET: " + netEl.innerText, 130, rowY+20);
+    pdf.text("Subtotal: "+sub.innerText, 130, y);
+    pdf.text("VAT: "+vatEl.innerText, 130, y+6);
+    pdf.text("Stamp: 1.000", 130, y+12);
+    pdf.text("NET: "+netEl.innerText, 130, y+20);
 
-    // FOOTER
-    pdf.setFontSize(9);
-    pdf.setFont("helvetica","normal");
-    pdf.text("www.vanoa.net | @vanoa | MF: I304285/Z/A/M/000", margin, 285);
-
-    pdf.save("DeliveryNote-" + docNumber.value + ".pdf");
+    pdf.save("DeliveryNote-"+docNumber.value+".pdf");
 }
 
 addRow();
