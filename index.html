@@ -42,6 +42,10 @@ body {
     color: #fff;
     padding: 18px;
     transition: 0.3s;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    overflow-y: auto;
 }
 
 .sidebar.collapsed { width: 70px; }
@@ -69,7 +73,429 @@ input, select {
 /* MAIN */
 .main {
     flex: 1;
-    padding: 24px;
+    padding: 40px;
+    display: flex;
+    justify-content: center;
+    background: #525659; /* PDF viewer grey background */
+}
+
+/* THE A4 CARD
+   Sets a strict physical size for the screen view that matches A4 dimensions. 
+*/
+.card {
+    width: 210mm;
+    min-height: 297mm;
+    background: #fff;
+    padding: 15px; /* The 15px offset from the A4 edge */
+    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+    box-sizing: border-box;
+}
+
+/* THE 1mm OUTLINE */
+.card-inner {
+    border: 1mm solid #000;
+    height: 100%;
+    min-height: calc(297mm - 30px);
+    padding: 40px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+/* EXPORT OVERRIDES */
+.is-exporting {
+    width: 210mm !important;
+    height: 297mm !important;
+    min-height: 297mm !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+}
+.is-exporting .card-inner {
+    height: calc(297mm - 30px) !important;
+    min-height: calc(297mm - 30px) !important;
+}
+
+.export-span {
+    display: inline-block;
+    padding: 8px;
+    font-size: 14px;
+}
+
+/* HEADER */
+.header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 40px;
+}
+
+.logo img { width: 4.5cm; }
+
+.company {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 6px;
+    line-height: 1.4;
+}
+
+.doc-title { text-align: right; }
+.doc-title h1 { margin: 0; font-size: 34px; font-weight: 800; }
+.doc-meta { font-size: 13px; color: var(--muted); }
+
+/* GRID */
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 30px;
+}
+
+.block-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    border-bottom: 2px solid #000;
+    display: inline-block;
+    margin-bottom: 10px;
+}
+
+/* TABLE */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background: #000;
+    color: #fff;
+    padding: 12px;
+    font-size: 11px;
+    text-transform: uppercase;
+    text-align: left;
+}
+
+td {
+    padding: 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 14px;
+}
+
+td input {
+    margin: 0;
+    padding: 12px;
+    background: transparent;
+    border-radius: 0;
+}
+
+.t-cell {
+    padding: 12px;
+}
+
+.delete-btn {
+    background: #ff4d4d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 8px;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+/* TOTALS */
+.totals-container {
+    margin-top: 30px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.totals {
+    width: 320px;
+}
+
+.row {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+}
+
+.grand {
+    border-top: 2px solid #000;
+    margin-top: 8px;
+    padding-top: 10px;
+    font-weight: 900;
+    font-size: 18px;
+}
+
+/* FOOTER */
+.footer {
+    margin-top: auto; /* Pushes footer strictly to the bottom of the bounding box */
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--muted);
+    border-top: 1px solid var(--line);
+    padding-top: 12px;
+}
+
+/* MOBILE SAFARI/CHROME */
+@media(max-width:900px){
+    .layout { flex-direction: column; }
+    .sidebar { width: 100%; height: auto; position: static; }
+    .main { padding: 10px; }
+    /* We scale the A4 box down visually for mobile, but the CSS actual size remains A4 for perfect export */
+    .card { transform: scale(0.9); transform-origin: top center; margin-bottom: -10%; }
+}
+@media(max-width:600px){
+    .card { transform: scale(0.6); margin-bottom: -50%; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="layout">
+
+<div class="sidebar" id="sidebar">
+
+<button class="toggle" onclick="toggle()">☰</button>
+
+<div class="content">
+
+<h3>Document</h3>
+<input id="docNumber" placeholder="Invoice Number">
+
+<h3>Company</h3>
+<input id="companyName" placeholder="Company Name">
+<input id="companyPhone" placeholder="Phone">
+<input id="companyEmail" placeholder="Email">
+<input id="companyAddress" placeholder="Address">
+
+<h3>Client</h3>
+<input id="clientName" placeholder="Client Name">
+<input id="clientAddress" placeholder="Client Address">
+<input id="clientMF" placeholder="MF (Tax ID)">
+
+<h3>Payment</h3>
+<select id="payment">
+<option>Cash</option>
+<option>Transfer</option>
+<option>Check</option>
+</select>
+
+<button onclick="addRow()" style="margin-top:15px; width:100%; padding:10px; cursor:pointer;">+ Add Item</button>
+<button onclick="exportPDF()" style="margin-top:10px; width:100%; padding:10px; background:#4CAF50; color:white; border:none; cursor:pointer; font-weight:bold;">Export PDF</button>
+
+</div>
+</div>
+
+<div class="main">
+
+<div class="card" id="documentCard">
+    <div class="card-inner">
+
+        <div class="header">
+        <div>
+        <div class="logo">
+        <img src="https://raw.githubusercontent.com/ShadowHD6/VANOA-Delivery-Note/main/VANOA%20Logo.svg" crossorigin="anonymous">
+        </div>
+
+        <div class="company" id="companyInfo"></div>
+        </div>
+
+        <div class="doc-title">
+        <h1>Delivery Note</h1>
+        <div class="doc-meta" id="pNumber"></div>
+        <div class="doc-meta" id="pDate"></div>
+        </div>
+        </div>
+
+        <div class="grid">
+        <div>
+        <div class="block-title">Billing To</div>
+        <div id="pClient"></div>
+        </div>
+
+        <div>
+        <div class="block-title">Client Details</div>
+        <div>MF: <span id="pMF"></span></div>
+        <div>Payment: <span id="pPayment"></span></div>
+        </div>
+        </div>
+
+        <table>
+        <thead>
+        <tr>
+        <th>Description</th>
+        <th>Qty</th>
+        <th>Unit</th>
+        <th>Total</th>
+        <th class="hide-on-export"></th>
+        </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+        </table>
+
+        <div class="totals-container">
+            <div class="totals">
+            <div class="row"><span>Subtotal</span><span id="sub">0.000</span></div>
+            <div class="row"><span>VAT 19%</span><span id="vat">0.000</span></div>
+            <div class="row"><span>Stamp</span><span>1.000</span></div>
+            <div class="row grand"><span>NET</span><span id="net">0.000</span></div>
+            </div>
+        </div>
+
+        <div class="footer">
+        <div>www.vanoa.tn</div>
+        <div>@vanoa</div>
+        <div>MF: I304285/Z/A/M/000</div>
+        </div>
+
+    </div>
+</div>
+
+</div>
+</div>
+
+<script>
+function toggle(){
+    document.getElementById("sidebar").classList.toggle("collapsed");
+}
+
+const rowsEl = document.getElementById("rows");
+const sub = document.getElementById("sub");
+const vat = document.getElementById("vat");
+const net = document.getElementById("net");
+
+const pNumber = document.getElementById("pNumber");
+const pDate = document.getElementById("pDate");
+const pClient = document.getElementById("pClient");
+const pPayment = document.getElementById("pPayment");
+const pMF = document.getElementById("pMF");
+const companyInfo = document.getElementById("companyInfo");
+
+// Setup real-time listeners
+const inputsToWatch = [
+    'docNumber', 'companyName', 'companyPhone', 'companyEmail', 
+    'companyAddress', 'clientName', 'clientAddress', 'clientMF', 'payment'
+];
+
+inputsToWatch.forEach(id => {
+    document.getElementById(id).addEventListener('input', update);
+});
+
+const f = n => (n||0).toFixed(3);
+pDate.innerText = new Date().toLocaleDateString();
+
+function updateCompany(){
+    const name = document.getElementById("companyName").value;
+    const phone = document.getElementById("companyPhone").value;
+    const email = document.getElementById("companyEmail").value;
+    const address = document.getElementById("companyAddress").value;
+    
+    let html = [];
+    if(name) html.push(`<strong>${name}</strong>`);
+    if(phone) html.push(phone);
+    if(email) html.push(email);
+    if(address) html.push(address);
+    
+    companyInfo.innerHTML = html.join("<br>");
+}
+
+function addRow(){
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `
+    <td><input type="text" placeholder="Item description"></td>
+    <td><input type="number" min="0" value="1"></td>
+    <td><input type="number" min="0" value="0.000" step="0.001"></td>
+    <td class="t-cell"><span class="t">0.000</span></td>
+    <td class="hide-on-export"><button class="delete-btn" onclick="this.closest('tr').remove();update()">✕</button></td>
+    `;
+
+    rowsEl.appendChild(tr);
+    tr.querySelectorAll("input").forEach(i => i.addEventListener("input", update));
+    update();
+}
+
+function update(){
+    let s = 0;
+
+    document.querySelectorAll("#rows tr").forEach(tr => {
+        let q = +tr.children[1].children[0].value || 0;
+        let p = +tr.children[2].children[0].value || 0;
+        let t = q * p;
+        tr.querySelector(".t").innerText = f(t);
+        s += t;
+    });
+
+    let v = s * 0.19;
+    let n = s + v + 1;
+
+    sub.innerText = f(s);
+    vat.innerText = f(v);
+    net.innerText = f(n);
+
+    const docNumVal = document.getElementById("docNumber").value;
+    pNumber.innerText = docNumVal ? "#" + docNumVal : "";
+
+    const cName = document.getElementById("clientName").value;
+    const cAddr = document.getElementById("clientAddress").value;
+    pClient.innerHTML = `${cName ? '<strong>'+cName+'</strong><br>' : ''}${cAddr}`;
+    
+    pPayment.innerText = document.getElementById("payment").value;
+    pMF.innerText = document.getElementById("clientMF").value;
+
+    updateCompany();
+}
+
+function exportPDF(){
+    const element = document.getElementById('documentCard');
+    
+    // 1. Force strict A4 physical dimensions (fixes clipping)
+    element.classList.add('is-exporting');
+
+    // 2. Hide delete buttons
+    const deleteCells = document.querySelectorAll('.hide-on-export');
+    deleteCells.forEach(cell => cell.style.display = 'none');
+
+    // 3. Swap <input> fields for clean <span> text so HTML2Canvas reads it properly
+    const inputs = element.querySelectorAll('input');
+    inputs.forEach(input => {
+        const span = document.createElement('span');
+        span.className = 'export-span';
+        span.innerText = input.value || '-';
+        input.style.display = 'none';
+        input.parentNode.insertBefore(span, input);
+    });
+
+    const docNumVal = document.getElementById("docNumber").value || "Draft";
+
+    const opt = {
+        margin:       0, // We set margin to 0 because our 15px padding inside the A4 CSS IS the margin
+        filename:     `DeliveryNote-${docNumVal}.pdf`,
+        image:        { type: 'jpeg', quality: 1 },
+        html2canvas:  { 
+            scale: 2, 
+            useCORS: true, 
+            scrollY: 0,
+            scrollX: 0
+        },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(element).save().then(() => {
+        // 4. Restore the screen layout back to normal
+        element.classList.remove('is-exporting');
+        deleteCells.forEach(cell => cell.style.display = '');
+        document.querySelectorAll('.export-span').forEach(span => span.remove());
+        inputs.forEach(input => input.style.display = '');
+    });
+}
+
+addRow();
+</script>
+
+</body>
+</html>    padding: 24px;
 }
 
 .card {
